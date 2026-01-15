@@ -1,0 +1,1090 @@
+\documentclass{extarticle}
+\sloppy
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES            																						  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[10pt]{extsizes}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage[shortlabels]{enumitem}
+\usepackage{microtype} 
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{commath}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PROBLEM ENVIRONMENT         																			           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems, breakable, skins}
+\newtcbtheorem{prob}% environment name
+              {Problem}% Title text
+  {enhanced, % tcolorbox styles
+  attach boxed title to top left={xshift = 4mm, yshift=-2mm},
+  colback=blue!5, colframe=black, colbacktitle=blue!3, coltitle=black,
+  boxed title style={size=small,colframe=gray},
+  fonttitle=\bfseries,
+  separator sign none
+  }%
+  {} 
+\newenvironment{problem}[1]{\begin{prob*}{#1}{}}{\end{prob*}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS/LEMMAS/ETC.         																			  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{thm}{Theorem}
+\newtheorem*{thm-non}{Theorem}
+\newtheorem{lemma}[thm]{Lemma}
+\newtheorem{corollary}[thm]{Corollary}
+\newtheorem*{definition}{Definition}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MY COMMANDS   																						  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\Real}{\mathcal{Re}}
+\newcommand{\poly}{\mathcal{P}}
+\newcommand{\mat}{\mathcal{M}}
+\DeclareMathOperator{\Span}{span}
+\newcommand{\Hom}{\mathcal{L}}
+\DeclareMathOperator{\Null}{null}
+\DeclareMathOperator{\Range}{range}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand\widebar[1]{\mathop{\overline{#1}}}
+\newcommand{\restr}[1]{|_{#1}}
+\DeclarePairedDelimiterX{\inp}[2]{\langle}{\rangle}{#1, #2}
+\DeclarePairedDelimiter\Mod{\lvert}{\rvert}
+\DeclarePairedDelimiter\Norm{\lVert}{\rVert}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION NUMBERING																				           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand\thesection{\Alph{section}:}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT START              																			           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{\vspace{-2em}Chapter 6: Inner Product Spaces}
+\author{\emph{Linear Algebra Done Right}, by Sheldon Axler}
+\date{}
+
+\begin{document}
+\maketitle
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION A            																			           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Inner Products and Norms}
+
+% Problem 1
+\begin{problem}{1}
+Show that the function that takes $\left((x_1,x_2), (y_1,y_2)\right)\in \R^2\times \R^2$ to $\Mod{x_1y_1} + \Mod{x_2y_2}$ is not an inner product on $\R^2$.
+\end{problem}
+\begin{proof}
+Suppose it were.  First notice
+\begin{align*}
+\inp{(1, 1) + (-1, -1)}{(1, 1)} &= \inp{(0, 0)}{(1, 1)}\\
+&= \Mod{0\cdot 1} + \Mod{0\cdot 1}\\
+&= 0.
+\end{align*}
+Next, since inner products are additive in the first slot, we also have
+\begin{align*}
+\inp{(1, 1) + (-1, -1)}{(1, 1)} &= \inp{(1, 1)}{(1, 1)} + \inp{(-1, -1)}{(1, 1)}\\
+&= \Mod{1\cdot 1} + \Mod{1 \cdot 1} + \Mod{(-1)\cdot 1} + \Mod{(-1) \cdot 1}\\
+&= 4.
+\end{align*}
+But this implies $0 = 4$, a contradiction.  Hence we must conclude that the function does not in fact define an inner product.
+\end{proof}
+
+% Problem 3
+\begin{problem}{3}
+Suppose $\F=\R$ and $V\neq \{0\}$.  Replace the positivity condition (which states that $\inp{v}{v}\geq0$ for all $v\in V$) in the definition of an inner product (6.3) with the condition that $\inp{v}{v} > 0$ for some $v\in V$.  Show that this change in the definition does not change the set of functions from $V\times V$ to $\R$ that are inner products on $V$.
+\end{problem}
+\begin{proof}
+Let $V$ be a nontrivial vector space over $\R$, let $A$ denote the set of functions $V\times V\to\R$ that are inner products on $V$ in the standard definition, and let $B$ denote the set of functions $V\times V\to \R$ under the modified definition.  We will show $A = B$.\\
+\indent Suppose $\inp{\cdot}{\cdot}_1\in A$.  Since $V\neq\{0\}$, there exists $v\in V-\{0\}$.  Then $\inp{v}{v}_1>0$, and so $\inp{\cdot}{\cdot}_1\in B$.  Thus $A\subseteq B$.\\ 
+\indent Conversely, suppose $\inp{\cdot}{\cdot}_2 \in B$.  Then there exists some $v'\in V$ such that $\inp{v'}{v'}_2 > 0$.  Suppose by way of contradiction there exists $u\in V$ is such that $\inp{u}{u}_2 < 0$.  Define $w = \alpha u + (1- \alpha) v'$ for $\alpha\in\R$.  It follows
+\begin{align*}
+\inp{w}{w}_2 &= \inp{\alpha u + (1- \alpha) v'}{\alpha u + (1- \alpha) v'}_2\\
+&= \inp{\alpha u}{\alpha u}_2 + 2\inp{\alpha u}{(1 - \alpha)v'}_2 + \inp{(1 - \alpha)v'}{(1 - \alpha)v'}_2\\
+&= \alpha^2\inp{u}{u}_2 + 2\alpha(1-\alpha)\inp{u}{v'}_2 + (1-\alpha)^2\inp{v'}{v'}_2.
+\end{align*}
+Notice the final expression is a polynomial in the indeterminate $\alpha$, call it $p$.  Since $p(0) = \inp{v'}{v'}_2 > 0$ and $p(1) = \inp{u}{u}_2 < 0$, by Bolzano's theorem there exists $\alpha_0\in(0, 1)$ such that $p(\alpha_0) = 0$.  That is, if $ w = \alpha_0u + (1 - \alpha_0)v'$, then $\inp{w}{w}_2 = 0$.  In particular, notice $\alpha_0\neq 0$, for otherwise $w = v'$, a contradiction since $\inp{v'}{v'}_2 > 0$.  Now, since $\inp{w}{w}_2 = 0$ iff $w = 0$ (by the definiteness condition of an inner product), it follows 
+\begin{equation*}
+u = \frac{\alpha_0 - 1}{\alpha_0} v.
+\end{equation*}
+Letting $t =  \frac{\alpha_0 - 1}{\alpha_0}$, we now have
+\begin{align*}
+\inp{u}{u}_2 &= \inp{tv'}{tv'}_2\\
+&= t^2\inp{v'}{v'}_2\\
+&> 0,
+\end{align*}
+where the inequality follows since $t\in(-1, 0)$ and $\inp{v'}{v'}_2 > 0$.  This contradicts our assumption that $\inp{u}{u}_2 < 0$, and so we have $\inp{\cdot}{\cdot}_2\in A$.  Therefore, $B\subseteq A$.  Since we've already shown $A\subseteq B$, this implies $A = B$, as desired.
+\end{proof}
+
+% Problem 5
+\begin{problem}{5}
+Let $V$ be finite-dimensional.  Suppose $T\in\Hom(V)$ is such that $\Norm{Tv}\leq \Norm{v}$ for every $v\in V$.  Prove that $T-\sqrt{2}I$ is invertible.
+\end{problem}
+\begin{proof}
+Let $v\in\Null(T - \sqrt{2}I)$, and suppose by way of contradiction that $v\neq 0$.  Then
+\begin{align*}
+Tv - \sqrt{2}v = 0 &\implies Tv = \sqrt{2}v\\
+&\implies \Norm{\sqrt{2}v}\leq \Norm{v}\\
+&\implies \sqrt{2}\cdot \Norm{v}\leq \Norm{v}\\
+&\implies \sqrt{2} \leq 1,
+\end{align*}
+a contradiction.  Hence $v = 0$ and $\Null(T - \sqrt{2}I) =\{0\}$, so that $T-\sqrt{2}I$ is injective.  Since $V$ is finite-dimensional, this implies $T-\sqrt{2}I$ is invertible, as desired.
+\end{proof}
+
+% Problem 7
+\begin{problem}{7}
+Suppose $u,v\in V$.  Prove that $\Norm{au + bv} = \Norm{bu + av}$ for all $a,b\in\R$ if and only if $\Norm{u} = \Norm{v}$.
+\end{problem}
+\begin{proof}
+$(\Rightarrow)$ Suppose $\Norm{au + bv} = \Norm{bu + av}$ for all $a,b\in\R$.  Then this equation holds when $a = 1$ and $b = 0$.  But then we must have $\Norm{u} = \Norm{v}$, as desired.\\
+\indent $(\Leftarrow)$ Conversely, suppose $\Norm{u} = \Norm{v}$.  Let $a,b\in\R$ be arbitrary, and notice
+\begin{align}
+\Norm{au + bv} &= \inp{au + bv}{au + bv} \nonumber \\
+&= \inp{au}{au} + \inp{au}{bv} + \inp{bv}{au} + \inp{bv}{bv} \nonumber \\
+&= a^2\Norm{u}^2 + ab\left(\inp{u}{v} + \inp{v}{u}\right) + b^2\Norm{v}^2. \label{eq1}
+\end{align}
+Also, we have
+\begin{align}
+\Norm{bu + av} &= \inp{bu + av}{bu + av} \nonumber \\
+&= \inp{bu}{bu} + \inp{bu}{av} + \inp{av}{bu} + \inp{av}{av} \nonumber \\
+&= b^2\Norm{u}^2 + ab\left(\inp{u}{v} + \inp{v}{u}\right) + a^2\Norm{v}^2. \label{eq2}
+\end{align}
+Since $\Norm{u} = \Norm{v}$, \eqref{eq1} equals \eqref{eq2}, and hence $\Norm{au + bv} = \Norm{bu + av}$.  Since $a,b$ were arbitrary, the result follows.
+\end{proof}
+
+% Problem 9
+\begin{problem}{9}
+Suppose $u,v\in V$ and $\Norm{u}\leq 1$ and $\Norm{v}\leq 1$.  Prove that 
+\begin{equation*}
+\sqrt{1 - \Norm{u}^2}\sqrt{1 - \Norm{v}^2}\leq 1 - \Mod{\inp{u}{v}}.
+\end{equation*}
+\end{problem}
+\begin{proof}
+By the Cauchy-Schwarz Inequality, we have $\Mod{\inp{u}{v}}\leq \Norm{u}\Norm{v}$.  Since $\Norm{u}\leq 1$ and $\Norm{v}\leq 1$, this implies
+\begin{align*}
+0 \leq 1 -\Norm{u}\Norm{v} \leq 1 -\Mod{\inp{u}{v}},
+\end{align*}
+and hence it's enough to show
+\begin{equation*}
+\sqrt{1 - \Norm{u}^2}\sqrt{1 - \Norm{v}^2} \leq 1 -\Norm{u}\Norm{v}.
+\end{equation*}
+Squaring both sides, it suffices to prove 
+\begin{equation}
+\left(1 - \Norm{u}^2\right)\left(1 - \Norm{v}^2\right) \leq \left(1 -\Norm{u}\Norm{v}\right)^2. \label{eq3}
+\end{equation}
+Notice
+\begin{align*}
+\left(1 -\Norm{u}\Norm{v}\right)^2 - \left(1 - \Norm{u}^2\right)\left(1 - \Norm{v}^2\right) &= \Norm{u}^2 - 2\Norm{u}\Norm{v} + \Norm{v}^2\\
+&= \left(\Norm{u} - \Norm{v}\right)^2\\
+&\geq 0,
+\end{align*}
+and hence inequality \eqref{eq3} holds, completing the proof.
+\end{proof}
+
+% Problem 11
+\begin{problem}{11}
+Prove that
+\begin{equation*}
+16 \leq (a + b + c + d)\left(\frac{1}{a} + \frac{1}{b} + \frac{1}{c} + \frac{1}{d}\right)
+\end{equation*}
+for all positive numbers $a,b,c,d$.
+\end{problem}
+\begin{proof}
+Define
+\begin{align*}
+x = \left(\sqrt{a}, \sqrt{b}, \sqrt{c}, \sqrt{d} \right)\quad\text{and}\quad y = \left(\sqrt{\frac{1}{a}}, \sqrt{\frac{1}{b}}, \sqrt{\frac{1}{c}}, \sqrt{\frac{1}{d}}\right).
+\end{align*}
+Then the Cauchy-Schwarz Inequality implies
+\begin{align*}
+(a + b + c + d)\left(\frac{1}{a} + \frac{1}{b} + \frac{1}{c} + \frac{1}{d}\right) &\geq \left(\sqrt{a}\sqrt{\frac{1}{a}} + \sqrt{b}\sqrt{\frac{1}{b}} + \sqrt{c}\sqrt{\frac{1}{c}} + \sqrt{d}\sqrt{\frac{1}{d}}\right)^2\\
+&= (1 + 1 + 1 + 1)^2\\
+&= 16,
+\end{align*}
+as desired.
+\end{proof}
+
+% Problem 13
+\begin{problem}{13}
+Suppose $u,v$ are nonzero vectors in $\R^2$.  Prove that
+\begin{equation*}
+\inp{u}{v} = \Norm{u}\Norm{v}\cos\theta,
+\end{equation*}
+where $\theta$ is the angle between $u$ and $v$ (thinking of $u$ and $v$ as arrows with initial point at the origin).
+\end{problem}
+\begin{proof}
+Let $A$ denote the line segment from the origin to $u$, let $B$ denote the line segment from the origin to $v$, and let $C$ denote the line segment from $v$ to $u$.  Then $A$ has length $\Norm{u}$, $B$ has length $\Norm{v}$ and $C$ has length $\Norm{u - v}$.  Letting $\theta$ denote the angle between $A$ and $B$, by the Law of Cosines we have
+\begin{align*}
+C^2 = A^2 + B^2 - 2BC\cos\theta,
+\end{align*} 
+or equivalently
+\begin{align*}
+\Norm{u - v}^2 = \Norm{u}^2 + \Norm{v}^2 - 2\Norm{u}\Norm{v}\cos\theta.
+\end{align*}
+It follows
+\begin{align*}
+2\Norm{u}\Norm{v}\cos\theta &= \Norm{u}^2 + \Norm{v}^2 - \Norm{u-v}^2\\
+&= \inp{u}{u} + \inp{v}{v} - \inp{u-v}{u-v}\\
+&= \inp{u}{u} + \inp{v}{v} - \left(\inp{u}{u} - 2\inp{u}{v} + \inp{v}{v}\right)\\
+&= 2\inp{u}{v}.
+\end{align*}
+Dividing both sides by $2$ gives the desired result.
+\end{proof}
+
+% Problem 15
+\begin{problem}{15}
+Prove that 
+\begin{equation*}
+\left(\sum_{j = 1}^na_j b_j\right)^2 \leq \left(\sum_{j = 1}^nj{a_j}^2\right)\left(\sum_{j=1}^n\frac{{b_j}^2}{j}\right)
+\end{equation*}
+for all real numbers $a_1,\dots,a_n$ and $b_1,\dots,b_n$.
+\end{problem}
+\begin{proof}
+Let
+\begin{equation*}
+u = \left(a_1, \sqrt{2}a_2, \dots, \sqrt{n}a_n\right)\quad\text{and}\quad v =\left(b_1, \frac{1}{\sqrt{2}}b_2,\dots, \frac{1}{\sqrt{n}}b_n\right).
+\end{equation*}
+Since $\inp{u}{v} = \sum_{k=1}^na_kb_k$, the Cauchy-Schwarz Inequality yields
+\begin{align*}
+\left(a_1b_1 +\dots + a_nb_n\right)^2 &\leq \Norm{u}^2\Norm{v}^2\\
+&=\left({a_1}^2 + 2{a_2}^2 + \dots + n{a_n}^2\right)\left({b_1}^2 + \frac{{b_2}^2}{2} + \dots + \frac{{b_n}^2}{n}\right),
+\end{align*}
+as desired.
+\end{proof}
+
+% Problem 17
+\begin{problem}{17}
+Prove or disprove: there is an inner product on $\R^2$ such that the associated norm is given by 
+\begin{equation*}
+\Norm{(x,y)} = \max\{\Mod{x},\Mod{y}\}
+\end{equation*}
+for all $(x, y)\in\R^2$.
+\end{problem}
+\begin{proof}
+Suppose such an inner product existed.  Then by the Parallelogram Equality, it follows
+\begin{align*}
+\Norm{(1, 0) + (0, 1)}^2 + \Norm{(1, 0) - (0, 1)}^2 = 2\left(\Norm{(1,0)}^2 + \Norm{(0,1)}^2\right).
+\end{align*}
+After simplification, this implies $2 = 4$, a contradiction.  Hence no such inner product exists.
+\end{proof}
+
+% Problem 19
+\begin{problem}{19}
+Suppose $V$ is a real inner product space.  Prove that
+\begin{equation*}
+\inp{u}{v} = \frac{\Norm{u+v}^2 - \Norm{u - v}^2}{4}
+\end{equation*}
+for all $u,v\in V$.
+\end{problem}
+\begin{proof}
+Suppose $V$ is a real inner product space and let $u,v\in V$.  It follows
+\begin{align*}
+\frac{\Norm{u+v}^2 - \Norm{u - v}^2}{4} &= \frac{\left(\Norm{u}^2 + 2\inp{u}{v} +\Norm{v}^2\right) - \left(\Norm{u}^2 - 2\inp{u}{v} +\Norm{v}^2\right)}{4}\\
+&= \frac{4\inp{u}{v}}{4}\\
+&= \inp{u}{v},
+\end{align*}
+as desired.
+\end{proof}
+
+% Problem 20
+\begin{problem}{20}
+Suppose $V$ is a complex inner product space.  Prove that
+\begin{equation*}
+\inp{u}{v} = \frac{\Norm{u+v}^2 - \Norm{u - v}^2 + \Norm{u + iv}^2i - \Norm{u -iv}^2i}{4}
+\end{equation*}
+for all $u,v\in V$.
+\end{problem}
+\begin{proof}
+Notice we have
+\begin{align*}
+\Norm{u + v}^2 &= \inp{u + v}{u + v}\\
+&=\Norm{u}^2 +\inp{u}{v} + \inp{v}{u} + \Norm{v}^2
+\end{align*}
+and
+\begin{align*}
+-\Norm{u - v}^2 &= -\inp{u - v}{u - v}\\
+&=-\Norm{u}^2 + \inp{u}{v} + \inp{v}{u} - \Norm{v}^2.
+\end{align*}
+Also, we have
+\begin{align*}
+\Norm{u + iv}^2i &= i\left(\inp{u + iv}{u+iv}\right)\\
+&= i\left(\Norm{u}^2 + \inp{u}{iv} + \inp{iv}{u} + \inp{iv}{iv}\right)\\
+&= i\left(\Norm{u}^2 - i\inp{u}{v} + i\inp{v}{u} + \Norm{v}^2\right)\\
+&= i\Norm{u}^2 + \inp{u}{v} - \inp{v}{u} + i\Norm{v}^2
+\end{align*}
+and
+\begin{align*}
+-\Norm{u - iv}^2i &= -i\left(\inp{u - iv}{u-iv}\right)\\
+&= -i\left(\Norm{u}^2 - \inp{u}{iv} - \inp{iv}{u} + \inp{iv}{iv}\right)\\
+&= -i\left(\Norm{u}^2 + i\inp{u}{v} - i\inp{v}{u} + \Norm{v}^2\right)\\
+&= -i\Norm{u}^2 + \inp{u}{v} - \inp{v}{u} - i\Norm{v}^2.
+\end{align*}
+Thus it follows
+\begin{align*}
+\Norm{u+v}^2 - \Norm{u - v}^2 + \Norm{u + iv}^2i - \Norm{u -iv}^2i = 4\inp{u}{v}.
+\end{align*}
+Dividing both sides by $4$ yields the desired result.
+\end{proof}
+
+%% Problem 21
+%\begin{problem}{21}
+%A norm on a vector space $U$ is a function $\Norm{\cdot}: U\to [0,\infty)$ such that $\Norm{u} = 0$ if and only if $u=0$, $\Norm{\alpha u} = \Mod{\alpha}\Norm{u}$ for all $\alpha\in\F$ and all $u\in U$, and $\Norm{u + v}\leq\Norm{u} + \Norm{v}$ for all $u,v\in U$.  Prove that a norm satisfying the parallelogram equality comes from an inner product (in other words, show that if $\Norm{\cdot}$ is a norm on $U$ satisfying the parallelogram equality, then there is an inner product $\inp{\cdot}{\cdot}$ on $U$ such that $\Norm{u} = \inp{u}{u}^{1/2}$ for all $u\in U$).
+%\end{problem}
+
+% Problem 23
+\begin{problem}{23}
+Suppose $V_1, \dots, V_m$ are inner product spaces.  Show that the equation
+\begin{equation*}
+\inp{(u_1,\dots, u_m)}{(v_1,\dots, v_m)} = \inp{u_1}{v_1} + \dots + \inp{u_m}{v_m}
+\end{equation*}
+defines an inner product on $V_1\times \dots \times V_m$. 
+\end{problem}
+\begin{proof}
+We prove that this definition satisfies each property of an inner product in turn.\\
+\textbf{Positivity: } Let $(v_1,\dots, v_m)\in V_1\times\dots V_m$.  Since $\inp{v_k}{v_k}$ is an inner product on $V_k$ for $k = 1,\dots, m$, we have $\inp{v_k}{v_k}\geq 0$.  Thus
+\begin{equation*}
+\inp{(v_1,\dots, v_m)}{(v_1,\dots, v_m)} = \inp{v_1}{v_1} + \dots + \inp{v_m}{v_m} \geq 0.
+\end{equation*}
+\textbf{Definiteness: } First suppose $\inp{(v_1,\dots, v_m)}{(v_1,\dots, v_m)} = 0$ for $(v_1,\dots, v_m)\in V_1\times\dots\times V_m$.  Then
+\begin{equation*}
+\inp{v_1}{v_1} + \dots + \inp{v_m}{v_m} = 0.
+\end{equation*}
+By positivity of each inner product on $V_k$ (for $k = 1,\dots, m$), we must have $\inp{v_k}{v_k}\geq 0$.  Thus the equation above holds only if $\inp{v_k}{v_k} = 0$ for each $k$, which is true iff $v_k = 0$ (by definiteness of the inner product on $V_k$).  Hence $(v_1, \dots, v_m) = (0, \dots, 0)$.  Conversely, suppose $(v_1,\dots, v_m) = (0, \dots, 0)$.  Then 
+\begin{align*}
+\inp{(v_1,\dots, v_m)}{(v_1,\dots, v_m)} &= \inp{v_1}{v_1} + \dots + \inp{v_m}{v_m}\\
+&= \inp{0}{0} + \dots + \inp{0}{0}\\
+&= 0 + \dots + 0\\
+&= 0,
+\end{align*}
+where the third equality follows from definiteness of the inner product on each $V_k$, respectively.\\
+\textbf{Additivity in first slot: } Let 
+\begin{equation*}
+(u_1,\dots, u_m), (v_1,\dots, v_m), (w_1,\dots, w_m)\in V_1\times\dots\times V_m.
+\end{equation*}  
+It follows
+\begin{align*}
+\langle (u_1, \dots, u_m) + &(v_1,\dots, v_m)), (w_1,\dots, w_m)\rangle \\
+&= \inp{(u_1 + v_1, \dots, u_m + v_m)}{(w_1,\dots, w_m)}\\
+&= \inp{u_1 + v_1}{w_1} + \dots + \inp{u_m + v_m}{w_m}\\
+&= \inp{u_1}{w_1} + \inp{v_1}{w_1} + \dots + \inp{u_m}{w_m} + \inp{v_m}{w_m}\\
+&= \inp{(u_1,\dots,u_m)}{(w_1,\dots, w_m)} + \inp{(v_1,\dots, v_m)}{(w_1,\dots,w_m)},
+\end{align*}
+where the third equality follows from additivity in the first slot of each inner product on $V_k$, respectively.\\
+\textbf{Homogeneity in the first slot: } Let $\lambda\in\F$ and 
+\begin{equation*}
+(u_1,\dots, u_m),(v_1,\dots, v_m)\in V_1\times \dots \times V_m.
+\end{equation*}
+It follows
+\begin{align*}
+\inp{\lambda(u_1,\dots, u_m)}{(v_1,\dots, v_m)} &= \inp{(\lambda u_1,\dots, \lambda u_m)}{(v_1,\dots, v_m)} \\
+&= \inp{\lambda u_1}{v_1} + \dots + \inp{\lambda u_m}{v_m}\\
+&= \lambda\inp{u_1}{v_1} + \dots + \lambda\inp{u_m}{v_m}\\
+&= \lambda(\inp{u_1}{v_1} + \dots + \inp{u_m}{v_m})\\
+&=\lambda\inp{(u_1,\dots, u_m)}{(v_1,\dots, v_m)},
+\end{align*}
+where the third equality follows from homogeneity in the first slot of each inner product on $V_k$, respectively.\\
+\textbf{Conjugate symmetry: } Again let
+\begin{equation*}
+(u_1,\dots, u_m),(v_1,\dots, v_m)\in V_1\times \dots \times V_m.
+\end{equation*}
+It follows
+\begin{align*}
+\inp{(u_1,\dots, u_m)}{(v_1,\dots, v_m)} &=  \inp{u_1}{v_1} + \dots + \inp{u_m}{v_m}\\
+&= \widebar{\inp{v_1}{u_1}} + \dots + \widebar{\inp{v_m}{u_m}}\\
+&= \widebar{\inp{u_1}{v_1} + \dots + \inp{u_m}{v_m}}\\
+&= \widebar{\inp{(v_1,\dots, v_m)}{(u_1,\dots, u_m)}},
+\end{align*}
+where the second equality follows from conjugate symmetry of each inner product on $V_k$, respectively.
+\end{proof}
+
+% Problem 24
+\begin{problem}{24}
+Suppose $S\in\Hom(V)$ is an injective operator on $V$.  Define $\inp{\cdot}{\cdot}_1$ by
+\begin{equation*}
+\inp{u}{v}_1 = \inp{Su}{Sv}
+\end{equation*}
+for $u,v\in V$.  Show that $\inp{\cdot}{\cdot}_1$ is an inner product on $V$.
+\end{problem}
+\begin{proof}
+We prove that this definition satisfies each property of an inner product in turn.\\
+\textbf{Positivity: } Let $v\in V$.  Then $\inp{v}{v}_1 = \inp{Sv}{Sv} \geq 0$.\\
+\textbf{Definiteness: } Suppose $\inp{v}{v} = 0$ for some $v\in V$.  This is true iff $\inp{Sv}{Sv} = 0$ (by definition) which is true iff $Sv = 0$ (by definiteness of $\inp{\cdot}{\cdot}$), which is true iff $v = 0$ (since $S$ is injective).\\
+\textbf{Additivity in first slot: } Let $u, v, w\in V$.  Then
+\begin{align*}
+\inp{u + v}{w}_1 &= \inp{S(u + v)}{Sw}\\
+&= \inp{Su + Sv}{Sw}\\
+&= \inp{Su}{Sw} + \inp{Sv}{Sw}\\
+&= \inp{u}{w}_1 + \inp{v}{w}_1.
+\end{align*}
+\textbf{Homogeneity in first slot: } Let $\lambda\in\F$ and $u, v\in V$.  Then
+\begin{align*}
+\inp{\lambda u}{v}_1 &= \inp{S(\lambda u)}{Sv}\\
+&= \inp{\lambda Su}{Sv}\\
+&= \lambda \inp{Su}{Sv}\\
+&= \lambda\inp{u}{v}_1.
+\end{align*}
+\textbf{Conjugate symmetry} Let $u,v\in V$.  Then
+\begin{align*}
+\inp{u}{v}_1 &= \inp{Su}{Sv}\\
+&= \widebar{\inp{Sv}{Su}}\\
+&= \widebar{\inp{v}{u}_1}.
+\end{align*}
+\end{proof}
+
+% Problem 25
+\begin{problem}{25}
+Suppose $S\in\Hom(V)$ is not injective.  Define $\inp{\cdot}{\cdot}_1$ as in the exercise above.  Explain why $\inp{\cdot}{\cdot}_1$ is not an inner product on $V$.
+\end{problem}
+\begin{proof}
+If $S$ is not injective, then $\inp{\cdot}{\cdot}_1$ fails the definiteness requirement in the definition of an inner product.  In particular, there exists $v\neq 0$ such that $Sv =0$.  Hence $\inp{v}{v}_1 = \inp{Sv}{Sv} = 0$ for a nonzero $v$.
+\end{proof}
+
+% Problem 27
+\begin{problem}{27}
+Suppose $u,v,w\in V$.  Prove that
+\begin{equation*}
+\norm{w - \frac{1}{2}(u + v)}^2 = \frac{\norm{w - u}^2 + \norm{w - v}^2}{2} - \frac{\norm{u - v}^2}{4}.
+\end{equation*}
+\end{problem}
+\begin{proof}
+We have
+\begin{align*}
+\norm{w - \frac{1}{2}(u + v)}^2 &= \norm{\left(\frac{w - u}{2}\right) + \left(\frac{w - v}{2} \right)}^2\\
+&=  2\norm{\frac{w - u}{2}}^2 + 2 \norm{\frac{w - v}{2}}^2 - \norm{\left(\frac{w-u}{2}\right) - \left(\frac{w-v}{2}\right)}^2\\
+&= \frac{\norm{w-u}^2 + \norm{w - v}^2}{2} - \norm{\frac{-u + v}{2}}^2\\
+&= \frac{\norm{w-u}^2 + \norm{w - v}^2}{2} - \frac{\norm{u - v}^2}{4},
+\end{align*}
+where the second equality follows by the Parallelogram Equality.
+\end{proof}
+
+The next problem requires some extra work to prove.  We first include a definition and prove a theorem.
+\begin{definition}
+Suppose $\norm{\cdot}_1$ and $\norm{\cdot}_2$ are norms on vector space $V$.  We say $\norm{\cdot}_1$ and $\norm{\cdot}_2$ are \emph{equivalent} if there exist $0 < C_1\leq C_2$ such that 
+\begin{equation*}
+C_1 \norm{v}_1 \leq \norm{v}_2 \leq C_2 \norm{v}_1
+\end{equation*}
+for all $v\in V$.
+\end{definition}
+\begin{thm-non}
+Any two norms on a finite-dimensional vector space are equivalent.
+\end{thm-non}
+\begin{proof}
+Let $V$ be finite-dimensional with basis $e_1,\dots, e_n$.  It suffices to prove that every norm on $V$ is equivalent to the $\ell_1$-style norm $\norm{\cdot}_1$ defined by
+\begin{equation*}
+\norm{v}_1 = \abs{\alpha_1} + \dots + \abs{\alpha_n}
+\end{equation*}
+for all $v = \alpha_1e_1 + \dots + \alpha_ne_n\in V$.\\
+\indent Let $\norm{\cdot}$ be a norm on $V$.  We wish to show $C_1\norm{v}_1 \leq \norm{v}\leq C_2\norm{v}_1$ for all $v\in V$ and some choice of $C_1,C_2$.  Since this is trivially true for $v = 0$, we need only consider $v\neq 0$, in which case we have
+\begin{align*}
+C_1 \leq \norm{u} \leq C_2, \tag{*}\label{key}
+\end{align*}
+where $u = v/\norm{v}_1$.  Thus it suffices to consider only vectors $v\in V$ such that $\norm{v}_1 = 1$.\\
+\indent We will now show that $\norm{\cdot}$ is continuous under $\norm{\cdot}_1$ and apply the Extreme Value Theorem to deduce the desired result.  So let $\epsilon > 0$ and define $M = \max\{\norm{e_1}, \dots, \norm{e_n}\}$ and
+\begin{equation*}
+\delta = \frac{\epsilon}{M}.
+\end{equation*}
+It follows that if $u,v\in V$ are such that $\norm{u - v}_1 < \delta$, then
+\begin{align*}
+\abs{\norm{u} - \norm{v}} &\leq \norm{u - v}\\
+&\leq M\norm{u - v}_1\\
+&\leq M\delta \\
+&= \epsilon,
+\end{align*}
+and $\norm{\cdot}$ is indeed continuous under the topology induced by $\norm{\cdot}_1$.  Let $\mathcal{S} = \{u\in V\mid \norm{u}_1=1\}$ (the unit sphere with respect to $\norm{\cdot}_1$).  Since $\mathcal{S}$ is compact and $\norm{\cdot}$ is continuous on it, by the Extreme Value Theorem we may define
+\begin{align*}
+C_1 = \min_{u \in \mathcal{S}}\norm{u}~~~\text{and}~~~C_2 =  \max_{u \in \mathcal{S}}\norm{u}.
+\end{align*}
+But now $C_1$ and $C_2$ satisfy \eqref{key}, completing the proof.
+\end{proof}
+
+% Problem 29
+\begin{problem}{29}
+For $u,v \in V$, define $d(u,v) = \norm{u - v}$.  
+\begin{enumerate}[(a)]
+\item Show that $d$ is a metric on $V$.
+\item Show that if $V$ is finite-dimensional, then $d$ is a complete metric on $V$ (meaning that every Cauchy sequence converges).
+\item Show that every finite-dimensional subspace of $V$ is a closed subset of $V$ (with respect to the metric $d$).
+\end{enumerate}
+\end{problem}
+\begin{proof}
+\begin{enumerate}[(a)]
+\item We show that $d$ satisfies each property of the definition of a metric in turn.\\
+\textbf{Identity of indiscernibles: } Let $u, v\in V$.  It follows
+\begin{align*}
+d(u, v) = 0 &\iff \sqrt{\inp{u-v}{u-v}} = 0\\
+&\iff \inp{u - v, u- v} = 0\\
+&\iff u - v = 0\\
+&\iff u = v.
+\end{align*}
+\textbf{Symmetry: } Let $u, v\in V$.  We have
+\begin{align*}
+d(u, v) &= \norm{u - v}\\
+&= \norm{(-1)(u - v)}\\
+&= \norm{v - u}\\
+&= d(v, u).
+\end{align*}
+\textbf{Triangle inequality: } Let $u, v, w\in V$.  Notice
+\begin{align*}
+d(u,v) + d(v, w) &= \norm{u - v} + \norm{v - w}\\
+&\leq \norm{(u - v) + (v - w)}\\
+&= \norm{u, w}\\
+&= d(u,w).
+\end{align*}
+\item Suppose $V$ is a $p$-dimensional vector space with basis $e_1,\dots, e_p$.  Assume $\{v_k\}_{k = 1}^\infty$ is Cauchy.  Then for $\epsilon > 0$, there exists $N\in\Z^+$ such that $\norm{v_m - v_n} < \epsilon$ whenever $m,n > N$.  Given any $v_i$ in our Cauchy sequence, we adopt the notation that $\alpha_{i, 1}, \dots, \alpha_{i, p}\in \F$ are always defined such that 
+\begin{equation*}
+v_i = \alpha_{i, 1}e_1 + \dots + \alpha_{i, p}e_p.
+\end{equation*}
+By our previous theorem, $\norm{\cdot}$ is equivalent to $\norm{\cdot}_1$ (where $\norm{\cdot}_1$ is defined in that theorem's proof).  Thus there exists some $c > 0$ such that, whenever $m,n > N$, we have
+\begin{align*}
+c\norm{v_m - v_n}_1 \leq \norm{v_m - v_n}  < \epsilon,
+\end{align*}
+and hence 
+\begin{equation*}
+c\left(\sum_{i = 1}^p\abs{\alpha_{m, i} - \alpha_{n, i}}\right) < \epsilon.
+\end{equation*}
+This implies that $\{\alpha_{k, i}\}_{k = 1}^\infty$ is Cauchy in $\R$ for each $i = 1,\dots, p$.  Since $\R$ is complete, these sequences converge.  So let $\alpha_i = \lim_{k \to \infty}\alpha_{k, i}$ for each $i$, and define $v = \alpha_1 e_1 + \dots + \alpha_p e_p$.  It follows
+\begin{align*}
+\norm{v_j - v} &= \norm{(\alpha_{j, 1} - \beta_1)e_1 + \dots + (\alpha_{j, p}-\beta_p)e_p}\\
+&\leq \abs{\alpha_{j, 1}-\alpha_1}\norm{e_1} + \dots + \abs{\alpha_{j, p}-\alpha_p}\norm{e_p}.
+\end{align*}
+Since $\alpha_{j, i}\to \alpha_i$ for $i = 1,\dots, p$, the RHS can be made arbitrarily small by choosing sufficiently large $M\in\Z^+$ and considering $j > M$.  Thus $\{v_k\}_{k = 1}^\infty$ converges to $v$, and $V$ is indeed complete with respect to $\norm{\cdot}$.
+\item Suppose $U$ is a finite-dimensional subspace of $V$, and suppose $\{u_k\}_{k=1}^\infty\subseteq U$ is Cauchy.  By (b), $\lim_{k \to \infty}u_k \in U$, hence $U$ contains all its limit points.  Thus $U$ is closed. \qedhere
+\end{enumerate}
+\end{proof}
+
+% Problem 31
+\begin{problem}{31}
+Use inner products to prove Apollonius's Identity: In a triangle with sides of length $a$, $b$, and $c$, let $d$ be the length of the line segment from the midpoint of the side of length $c$ to the opposite vertex.  Then
+\begin{equation*}
+a^2 + b^2 = \frac{1}{2}c^2 + 2d^2.
+\end{equation*}
+\end{problem}
+\begin{proof}
+Consider a triangle formed by vectors $v, w\in\R^2$ and the origin such that $\norm{w} = a$, $\norm{v} = c$, and $\norm{w - v} = b$.  The identity follows by applying Problem 27 with $u = 0$.
+\end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION B            																			           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Orthonormal Bases}
+
+% Problem 1
+\begin{problem}{1}
+\begin{enumerate}[(a)]
+\item Suppose $\theta\in \R$.  Show that $(\cos\theta, \sin\theta)$, $(-\sin\theta,\cos\theta)$ and $(\cos\theta, \sin\theta)$, $(\sin\theta,-\cos\theta)$ are orthonormal bases of $\R^2$.
+\item Show that each orthonormal basis of $\R^2$ is of the form given by one of the two possibilities of part (a).
+\end{enumerate}
+\end{problem}
+
+\begin{proof}
+\begin{enumerate}[(a)]
+\item Notice
+\begin{equation*}
+\inp{(\cos\theta, \sin\theta)}{(-\sin\theta,\cos\theta)} = -\sin\theta\cos\theta + \sin\theta\cos\theta = 0
+\end{equation*}
+and
+\begin{equation*}
+\inp{(\cos\theta, \sin\theta)}{(\sin\theta,-\cos\theta)} = \sin\theta\cos\theta - \sin\theta\cos\theta = 0,
+\end{equation*}
+hence both lists are orthonormal.  Clearly the three distinct vectors contained in the two lists all have norm $1$ (following from the identity $\cos^2\theta + \sin^2\theta = 1$).  Since both lists have length $2$, by  Theorem 6.28 both lists are orthonormal bases.
+\item Suppose $e_1,e_2$ is an orthonormal basis of $\R^2$.  Since $\norm{e_1} = \norm{e_2} = 1$, there exist $\theta, \varphi \in [0, 2\pi)$ such that 
+\begin{equation*}
+e_1 = (\cos\theta, \sin\theta) \quad\text{and}\quad e_2 = (\cos\varphi, \sin\varphi).
+\end{equation*}
+Next, since $\inp{e_1}{e_2} = 0$, we have
+\begin{equation*}
+\cos\theta\cos\varphi + \sin\theta\sin\varphi = 0.
+\end{equation*}
+Since $\cos\theta\cos\varphi = \frac{1}{2}(\cos(\theta + \varphi) + \cos(\theta - \varphi))$ and $\sin\theta\sin\varphi = \cos(\theta - \varphi) - \cos(\theta + \varphi)$, the above implies
+\begin{equation*}
+\cos(\theta - \varphi) = 0
+\end{equation*}
+and thus $\varphi = \theta + \frac{3\pi}{2} - n\pi$, for $n \in \Z$.  Since $\theta,\varphi\in[0, 2\pi)$, this implies $\varphi = \theta \pm \frac{\pi}{2}$.  If $\varphi = \theta + \frac{\pi}{2}$, then
+\begin{align*}
+e_2 &= \left(\cos\left(\theta + \frac{\pi}{2}\right), \sin\left(\theta + \frac{\pi}{2}\right)\right)\\
+&= (-\sin\theta, \cos\theta),
+\end{align*} 
+and if $\varphi = \theta - \frac{\pi}{2}$, then
+\begin{align*}
+e_2 &= \left(\cos\left(\theta - \frac{\pi}{2}\right), \sin\left(\theta - \frac{\pi}{2}\right)\right)\\
+&= (\sin\theta, -\cos\theta).
+\end{align*}
+Thus all orthonormal bases of $\R^2$ have one of the two forms from (a).
+\end{enumerate}
+\end{proof}
+
+% Problem 3
+\begin{problem}{3}
+Suppose $T\in\Hom(\R^3)$ has an upper-triangular matrix with respect to the basis $(1, 0, 0)$, $(1, 1, 1)$, $(1, 1, 2)$.  Find an orthonormal basis of $\R^3$ (use the usual inner product on $\R^3$) with respect to which $T$ has an upper-triangular matrix.
+\end{problem}
+\begin{proof}
+Let $v_1 = (1, 0, 0), v_2 = (1, 1, 1)$, and $v_3 = (1, 1, 2)$.  By the proof of 6.37, $T$ has an upper-triangular matrix with respect to the the basis $e_1, e_2, e_3$ generated by applying the Gram-Schmidt Procedure to $v_1, v_2, v_3$.  Since $\norm{v_1} = 1$, $e_1 = v_1$.  Next, we have
+\begin{align*}
+e_2 &= \frac{v_2 - \inp{v_2}{e_1} e_1}{\norm{ v_2 - \inp{v_2}{e_1} e_1}}\\
+&=\frac{(1, 1, 1) - \inp{(1, 1, 1)}{(1, 0, 0)}(1, 0, 0)}{\norm{(1, 1, 1) - \inp{(1, 1, 1)}{(1, 0, 0)}(1, 0, 0)}}\\
+&= \frac{(1, 1, 1) - (1, 0, 0)}{\norm{(1, 1, 1) - (1, 0, 0)}}\\
+&= \frac{(0, 1, 1)}{\norm{(0, 1, 1)}}\\
+&= \left(0, \frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)
+\end{align*}
+and
+\begin{align*}
+e_3 &=  \frac{v_3 - \inp{v_3}{e_1} e_1 - \inp{v_3}{e_2}e_2}{\norm{v_3 - \inp{v_3}{e_1} e_1 - \inp{v_3}{e_2}e_2}}\\
+&= \frac{(1, 1, 2) - \inp{(1, 1, 2)}{(1, 0, 0)}(1, 0, 0) - \left\langle(1, 1, 2), \left(0, \frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)\right\rangle \left(0, \frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)}{\norm{(1, 1, 2) - \inp{(1, 1, 2)}{(1, 0, 0)}(1, 0, 0) - \left\langle(1, 1, 2), \left(0, \frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)\right\rangle \left(0, \frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)}}\\
+&= \frac{(1, 1, 2) - (1, 0, 0) - \frac{3}{\sqrt{2}}\left(0, \frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)}{\norm{(1, 1, 2) - (1, 0, 0) - \frac{3}{\sqrt{2}}\left(0, \frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)}}\\
+&= \frac{\left(0, -\frac{1}{2}, \frac{1}{2}\right)}{\norm{\left(0, -\frac{1}{2}, \frac{1}{2}\right)}}\\
+&= \left(0, -\frac{\sqrt{2}}{2}, \frac{\sqrt{2}}{2}\right),
+\end{align*}
+and we're done.
+\end{proof}
+
+% Problem 4
+\begin{problem}{4}
+Suppose $n$ is a positive integer.  Prove that
+\begin{align*}
+\frac{1}{\sqrt{2\pi}}, \frac{\cos x}{\sqrt{\pi}}, \frac{\cos 2x}{\sqrt{\pi}}, \dots, \frac{\cos nx}{\sqrt{\pi}}, \frac{\sin x}{\sqrt{\pi}}, \frac{\sin 2x}{\sqrt{\pi}}, \dots, \frac{\sin nx}{\sqrt{\pi}}
+\end{align*}
+is an orthonormal list of vectors in $\mathcal{C}[-\pi, \pi]$, the vector space of continuous real-valued functions on $[-\pi, \pi]$ with inner product
+\begin{align*}
+\inp{f}{g} = \int_{-\pi}^\pi f(x)g(x)dx.
+\end{align*}
+\end{problem}
+\begin{proof}
+First we show that all vectors in the list have norm $1$.  Notice
+\begin{align*}
+\norm{\frac{1}{\sqrt{2\pi}}} &= \sqrt{\int_{-\pi}^\pi\frac{1}{2\pi}dx}\\
+&=\sqrt{ \frac{1}{2\pi}\int_{-\pi}^\pi dx}\\
+&= 1.
+\end{align*}
+And for $k\in\Z^+$, we have
+\begin{align*}
+\norm{\frac{\cos(kx)}{\sqrt{\pi}}} &= \sqrt{\frac{1}{\pi}\int_{-\pi}^\pi \cos(kx)^2dx}\\
+&= \sqrt{\frac{1}{\pi}\left[\frac{\sin(2kx)}{4k} + \frac{x}{2}\right]_{-\pi}^\pi}\\
+&= \sqrt{\frac{1}{\pi}\left[\frac{\pi}{2} - \left(-\frac{\pi}{2}\right)\right]}\\
+&= 1,
+\end{align*}
+and
+\begin{align*}
+\norm{\frac{\sin(kx)}{\sqrt{\pi}}} &= \sqrt{\frac{1}{\pi}\int_{-\pi}^\pi \sin(kx)^2dx}\\
+&= \sqrt{\frac{1}{\pi}\left[\frac{x}{2} - \frac{\cos(2kx)}{4k}\right]_{-\pi}^\pi}\\
+&= \sqrt{\frac{1}{\pi}\left[\frac{\pi}{2} - \left(-\frac{\pi}{2}\right)\right]}\\
+&= 1,
+\end{align*}
+so indeed all vectors have norm $1$.  Now we show them to be pairwise orthogonal.  Suppose $j,k\in\Z$ are such that $j \neq k$.  It follows from basic calculus
+\begin{align*}
+\left\langle \frac{\sin(jx)}{\sqrt{\pi}}, \frac{\sin(kx)}{\sqrt{\pi}}\right\rangle &= \frac{1}{\pi}\int_{-\pi}^\pi\sin(jx)\sin(kx)dx\\
+&= \frac{1}{\pi}\left[\frac{k\sin(jx)\cos(kx) + j\cos(jx)\sin(kx)}{j^2 - k^2}\right]_{-\pi}^\pi\\
+&= 0,
+\end{align*}
+\begin{align*}
+\left\langle \frac{\sin(jx)}{\sqrt{\pi}}, \frac{\cos(kx)}{\sqrt{\pi}}\right\rangle &= \frac{1}{\pi}\int_{-\pi}^\pi\sin(jx)\cos(kx)dx\\
+&= -\frac{1}{\pi}\left[\frac{k\sin(jx)\sin(kx) + j\cos(jx)\cos(kx)}{j^2 - k^2}\right]_{-\pi}^\pi\\
+&= -\frac{1}{\pi}\left[\left(\frac{j\cos(j\pi)\cos(k\pi)}{j^2- k^2} \right) - \left(\frac{j\cos(-j\pi)\cos(-k\pi)}{j^2- k^2}\right) \right]\\
+&= 0,
+\end{align*}
+\begin{align*}
+\left\langle \frac{\cos(jx)}{\sqrt{\pi}}, \frac{\cos(kx)}{\sqrt{\pi}}\right\rangle &= \frac{1}{\pi}\int_{-\pi}^\pi\cos(jx)\cos(kx)dx\\
+&= \frac{1}{\pi}\left[\frac{j\sin(j x)\cos(k x) - k\cos(j x)\sin(k x)}{j^2 - k^2}\right]_{-\pi}^\pi\\
+&= 0,
+\end{align*}
+\begin{align*}
+\left\langle \frac{\sin(jx)}{\sqrt{\pi}}, \frac{\cos(jx)}{\sqrt{\pi}}\right\rangle &= \frac{1}{\pi}\int_{-\pi}^\pi\sin(jx)\cos(jx)dx\\
+&= \left[-\frac{\cos^2(jx)}{2j}\right]_{-\pi}^\pi\\
+&= 0,
+\end{align*}
+\begin{align*}
+\left\langle \frac{1}{\sqrt{2\pi}}, \frac{\cos(jx)}{\sqrt{\pi}}\right\rangle &= \frac{1}{\sqrt{2}\pi}\int_{-\pi}^\pi\cos(jx)dx\\
+&= \frac{1}{\sqrt{2}\pi}\left[\frac{\sin(jx)}{j}\right]_{-\pi}^\pi\\
+&= 0,
+\end{align*}
+and
+\begin{align*}
+\left\langle \frac{1}{\sqrt{2\pi}}, \frac{\sin(jx)}{\sqrt{\pi}}\right\rangle &= \frac{1}{\sqrt{2}\pi}\int_{-\pi}^\pi\sin(jx)dx\\
+&= \frac{1}{\sqrt{2}\pi}\left[-\frac{\cos(jx)}{j}\right]_{-\pi}^\pi\\
+&= \frac{1}{\sqrt{2}\pi}\left[-\frac{\cos(j\pi) - \cos(-j\pi)}{j}\right]\\
+&= 0.
+\end{align*}
+Thus the list is indeed an orthonormal list in $\mathcal{C}[-\pi, \pi]$.
+\end{proof}
+
+
+% Problem 5
+\begin{problem}{5}
+On $\poly_2(\R)$, consider the inner product given by 
+\begin{equation*}
+\inp{p}{q} = \int_0^1p(x)q(x)\,dx.
+\end{equation*}
+Apply the Gram-Schmidt Procedure to the basis $1, x, x^2$ to produce an orthonormal basis of $\poly_2(\R)$.
+\end{problem}
+\begin{proof}
+First notice $\norm{1} = 1$, hence $e_1 = 1$.  Next notice
+\begin{align*}
+v_2 - \inp{v_1}{e_1}e_1 &= x - \inp{x}{1}\\
+&= x - \int_0^1x\,dx\\
+&= x - \frac{1}{2}
+\end{align*}
+and 
+\begin{align*}
+\norm{x - \frac{1}{2}} &= \sqrt{\left\langle x - \frac{1}{2}, x - \frac{1}{2}\right\rangle}\\
+&= \sqrt{\int_0^1\left(x - \frac{1}{2}\right)\left(x - \frac{1}{2}\right)\,dx}\\
+&= \sqrt{\int_0^1\left(x^2 - x + \frac{1}{4}\right)\,dx}\\
+&= \sqrt{\frac{1}{3} - \frac{1}{2} + \frac{1}{4}}\\
+&= \frac{1}{2\sqrt{3}},
+\end{align*}
+and therefore we have
+\begin{equation*}
+e_2 = 2\sqrt{3}\left(x - \frac{1}{2}\right).
+\end{equation*}
+To compute $e_3$, first notice
+\begin{align*}
+v_3 - \inp{v_3}{e_1}e_1 - \inp{v_3}{e_2}e_2 &= x^2 - \int_0^1x^2\,dx - \left[2\sqrt{3}\int_0^1x^2\left(x - \frac{1}{2}\right)\,dx\right]e_2\\
+&= x^2 - \frac{1}{3} -  \left[2\sqrt{3}\int_0^1\left(x^3 - \frac{x^2}{2}\right)\,dx\right]\left[2\sqrt{3}\left(x - \frac{1}{2}\right)\right]\\
+&= x^2 - \frac{1}{3} - 12\left(\frac{1}{4} - \frac{1}{6}\right)\left(x - \frac{1}{2}\right)\\
+&= x^2 - \frac{1}{3} - \left(x - \frac{1}{2}\right)\\
+&= x^2 - x + \frac{1}{6}
+\end{align*}
+and 
+\begin{align*}
+\norm{ x^2 - x + \frac{1}{6}} &= \sqrt{\left\langle x^2 - x + \frac{1}{6},  x^2 - x + \frac{1}{6}\right\rangle}\\
+&= \sqrt{\int_0^1\left( x^2 - x + \frac{1}{6}\right)\left( x^2 - x + \frac{1}{6}\right)\,dx}\\
+&= \sqrt{\int_0^1\left(x^4 - 2x^3 + \frac{4}{3}x^2 - \frac{x}{3} + \frac{1}{36}\right)\,dx}\\
+&= \sqrt{\frac{1}{5} - \frac{1}{2} + \frac{4}{9} - \frac{1}{6} + \frac{1}{36}}\\
+&= \frac{1}{\sqrt{180}}\\
+&= \frac{1}{6\sqrt{5}}.
+\end{align*}
+Thus
+\begin{equation*}
+e_3 = 6\sqrt{5}\left(x^2 - x + \frac{1}{6}\right),
+\end{equation*}
+and we're done.
+\end{proof}
+
+% Problem 7
+\begin{problem}{7}
+Find a polynomial $q\in\poly_2(\R)$ such that
+\begin{equation*}
+p\left(\frac{1}{2}\right)=\int_0^1p(x)q(x)\,dx
+\end{equation*}
+for every $p\in\poly_2(\R)$.  
+\end{problem}
+\begin{proof}
+Consider the inner product $\inp{p}{q} = \int_0^1p(x)q(x)\,dx$ on $\poly_2(\R)$.  Define $\varphi\in\Hom(\poly_2(\R))$ by $\varphi(p) = p\left(\frac{1}{2}\right)$ and let $e_1, e_2, e_3$ be the orthonormal basis found in Problem 5.  By the Riesz Representation Theorem, there exists $q\in\poly_2(\R)$ such that $\varphi(p) = \inp{p}{q}$ for all $p\in\poly_2(\R)$.  That is, such that 
+\begin{equation*}
+p\left(\frac{1}{2}\right) = \int_0^1p(x)q(x)\,dx.
+\end{equation*}
+Equation 6.43 in the proof of the Riesz Representation Theorem fashions a way to find $q$.  In particular, we have 
+\begin{align*}
+q(x) &= \widebar{\varphi(e_1)}e_1 + \widebar{\varphi(e_2)}e_2 + \widebar{\varphi(e_3)}e_3\\
+&= e_1 + 2\sqrt{3}\left(\frac{1}{2} - \frac{1}{2}\right)e_2 + 6\sqrt{5}\left(\frac{1}{4} - \frac{1}{2} + \frac{1}{6}\right)e_3\\
+&= 1 + 6\sqrt{5}\left(\frac{-1}{12}\right)\left[6\sqrt{5}\left(x^2 - x + \frac{1}{6}\right)\right]\\
+&= -15(x^2 - x) - \frac{3}{2},
+\end{align*}
+as desired.
+\end{proof}
+
+% Problem 9
+\begin{problem}{9}
+What happens if the Gram-Schmidt Procedure is applied to a list of vectors that is not linearly independent?
+\end{problem}
+\begin{proof}
+Suppose $v_1,\dots,v_m$ are linearly dependent.  Let $j$ be the smallest integer in $\{1,\dots, m\}$ such that $v_j \in \Span(v_1,\dots, v_{j - 1})$.  Then $v_1,\dots, v_{j - 1}$ are linearly independent.  The first $j - 1$ steps of the Gram-Schmidt Procedure will produce an orthonormal list $e_1,\dots, e_{j - 1}$.  At step $j$, however, notice
+\begin{align*}
+v_j - \inp{v_j}{e_1}e_1 - \dots - \inp{v_j}{e_{j - 1}}e_{j-1} = v_j - v_j = 0,
+\end{align*}
+and we are left trying to assign $e_j$ to $\frac{0}{0}$, which is undefined.  Thus the procedure cannot be applied to a linearly dependent list.
+\end{proof}
+
+% Problem 11
+\begin{problem}{11}
+Suppose $\inp{\cdot}{\cdot}_1$ and $\inp{\cdot}{\cdot}_2$ are inner products on $V$ such that $\inp{v}{w}_1 = 0$ if and only if $\inp{v}{w}_2 = 0$.  Prove that there is a positive number $c$ such that $\inp{v}{w}_1 = c\inp{v}{w}_2$ for every $v,w\in V$.
+\end{problem}
+\begin{proof}
+Let $v, w\in V$ be arbitrary.  By hypothesis, if $v$ and $w$ are orthogonal relative to one of the inner products, they're orthogonal relative to the other.  Hence any choice of $c\in \R$ would satisfy $\inp{v}{w}_1 = c\inp{v}{w}_2$.  So suppose $v$ and $w$ are not orthogonal relative to either inner product.  Then both $v$ and $w$ must be nonzero (by Theorem 6.7, parts b and c, respectively).  Thus $\inp{v}{v}_1$, $\inp{w}{w}_1$, $\inp{v}{v}_2$, and $\inp{w}{w}_2$ are all nonzero as well.  It now follows
+\begin{align*}
+0 &= \inp{v}{w}_1 - \frac{\inp{v}{w}_1}{\inp{v}{v}_1}\inp{v}{v}_1\\
+&= \inp{v}{w}_1 - \left\langle v, \widebar{\left(\frac{\inp{v}{w}_1}{\inp{v}{v}_1}\right)}v \right\rangle_1\\
+&= \left\langle v, w - \widebar{\left(\frac{\inp{v}{w}_1}{\inp{v}{v}_1}\right)}v \right\rangle_1\\
+&= \left\langle v, w - \widebar{\left(\frac{\inp{v}{w}_1}{\inp{v}{v}_1}\right)}v \right\rangle_2\\
+&= \inp{v}{w}_2 - \left\langle v, \widebar{\left(\frac{\inp{v}{w}_1}{\inp{v}{v}_1}\right)}v \right\rangle_2\\
+&= \inp{v}{w}_2 - \frac{\inp{v}{w}_1}{\inp{v}{v}_1}\inp{v}{v}_2\\
+&= \inp{v}{w}_2 - \frac{\inp{v}{v}_2}{\inp{v}{v}_1}\inp{v}{w}_1,
+\end{align*}
+where the fifth equality follows by our hypothesis.  Thus 
+\begin{equation}
+\inp{v}{w}_1 = \frac{{\norm{v}_1}^2}{{\norm{v}_2}^2}\inp{v}{w}_2. \label{eq4}
+\end{equation}
+By a similar computation, notice
+\begin{align*}
+0 &= \inp{v}{w}_1 - \frac{\inp{v}{w}_1}{\inp{w}{w}_1}\inp{w}{w}_1\\
+&= \inp{v}{w}_1 - \left\langle \frac{\inp{v}{w}_1}{\inp{w}{w}_1}w, w \right\rangle_1\\
+&= \left\langle v - \frac{\inp{v}{w}_1}{\inp{w}{w}_1}w, w \right\rangle_1\\
+&= \left\langle v - \frac{\inp{v}{w}_1}{\inp{w}{w}_1}w, w \right\rangle_2\\
+&= \inp{v}{w}_2 - \left\langle \frac{\inp{v}{w}_1}{\inp{w}{w}_2}w, w \right\rangle_2\\
+&= \inp{v}{w}_2 - \frac{\inp{v}{w}_1}{\inp{w}{w}_2}\inp{w}{w}_2\\
+&= \inp{v}{w}_2 - \frac{\inp{w}{w}_2}{\inp{w}{w}_1}\inp{v}{w}_1,
+\end{align*}
+and thus
+\begin{equation}
+\inp{v}{w}_1 = \frac{{\norm{w}_1}^2 }{{\norm{w}_2}^2}\inp{v}{w}_2 \label{eq5}
+\end{equation}
+as well.  By combining Equations \eqref{eq4} and \eqref{eq5}, we conclude 
+\begin{equation*}
+ \frac{\inp{v}{v}_1}{\inp{v}{v}_2} =  \frac{\inp{w}{w}_1}{\inp{w}{w}_2}.
+\end{equation*}
+Since $v$ and $w$ were arbitrary nonzero vectors in $V$, choosing $c = {\norm{u}_1}^2/{\norm{u}_2}^2$ for any $u\neq 0$ guarantees $\inp{v}{w}_1 = c\inp{v}{w}_2$ for every $v,w\in V$, as was to be shown.
+\end{proof}
+
+% Problem 13
+\begin{problem}{13}
+Suppose $v_1,\dots, v_m$ is a linearly independent list in $V$.  Show that there exists $w\in V$ such that $\inp{w}{v_j} > 0$ for all $j \in \{1, \dots, m\}$.  
+\end{problem}
+\begin{proof}
+Let $W = \Span(v_1,\dots, v_m)$.  Given $v\in W$, let $a_1,\dots, a_m\in\F$ be such that $v = a_1v_1 + \dots + a_mv_m$.  Define $\varphi\in\Hom(W)$ by
+\begin{align*}
+\varphi(v) = a_1 + \dots + a_m.
+\end{align*}
+By the Riesz Representation Theorem, there exists $w\in W$ such that $\varphi(v) = \inp{v}{w}$ for all $v\in W$.  But then $\varphi(v_j) = 1$ for $j \in\{1,\dots, m\}$, and indeed such a $w\in V$ exists.
+\end{proof}
+
+% Problem 15
+\begin{problem}{15}
+Suppose $C_\R([-1, 1])$ is the vector space of continuous real-valued functions on the interval $[-1, 1]$ with inner product given by
+\begin{equation*}
+\inp{f}{g} = \int_{-1}^1f(x)g(x)dx
+\end{equation*}
+for $f,g\in C_\R([-1, 1])$.  Let $\varphi$ be the linear functional on $C_\R([-1, 1])$ defined by $\varphi(f) = f(0)$.  Show that there does not exist $g\in C_\R([-1,1])$ such that 
+\begin{equation*}
+\varphi(f) = \inp{f}{g}
+\end{equation*}
+for every $f\in C_\R([-1, 1])$.  
+\end{problem}
+\begin{proof}
+Suppose not.  Then there exists $g\in C_\R([-1,1])$ such that 
+\begin{equation*}
+\varphi(f) = \inp{f}{g}
+\end{equation*}
+for every $f\in C_\R([-1, 1])$.  Choose $f(x) = x^2 g(x)$.  Then $f(0) = 0$, and hence
+\begin{equation*}
+\int_{-1}^1 f(x) g(x)dx = \int_{-1}^1 [xg(x)]^2dx = 0.
+\end{equation*}
+Now, let $h(x) = xg(x)$.  Since $h$ is continuous on $[-1, 1]$, there exists an interval $[a, b]\subseteq [-1, 1]$ such that $h(x)\neq 0$ for all $x \in [a, b]$.  By the Extreme Value Theorem, $h(x)^2$ has a minimum at some $m\in[a,b]$.  Thus $h(m)^2> 0$, and we now conclude
+\begin{align*}
+0 = \int_{-1}^1h(x)^2dx = \int_a^bh(x)^2dx \geq (b-a)h(m)^2 > 0,
+\end{align*} 
+which is absurd.  Thus it must be that no such $g$ exists.
+\end{proof}
+
+% Problem 17
+\begin{problem}{17}
+For $u\in V$, let $\Phi_u$ denote the linear functional on $V$ defined by
+\begin{equation*}
+(\Phi_u)(v) = \inp{v}{u}
+\end{equation*}
+for $v \in V$.
+\begin{enumerate}[(a)]
+\item Show that if $\F = \R$, then $\Phi$ is a linear map from $V$ to $V'$.
+\item Show that if $\F = \C$ and $V\neq \{0\}$, then $\Phi$ is not a linear map.
+\item Show that $\Phi$ is injective.
+\item Suppose $\F = \R$ and $V$ is finite-dimensional.  Use parts (a) and (c) and a dimension-counting argument (but without using 6.42) to show that $\Phi$ is an isomorphism from $V$ to $V'$.
+\end{enumerate}
+\end{problem}
+\begin{proof}
+\begin{enumerate}[(a)]
+\item Suppose $\F=\R$.  Let $u, u'\in V$ and $\alpha\in\R$.  Then, for all $v\in V$, we have
+\begin{equation*}
+\Phi_{u + u'}(v) = \inp{v}{u + u'} = \inp{v}{u} + \inp{v}{u'} = \Phi_u(v) + \Phi_{u'}(v)
+\end{equation*}
+and 
+\begin{equation*}
+\Phi_{\alpha u}(v) = \inp{v}{\alpha u} = \overline{\alpha}\inp{v}{u} = \alpha\inp{v}{u} = \alpha\Phi_u(v).
+\end{equation*}
+Thus $\Phi$ is indeed a linear map.
+\item Suppose $\F = \C$ and $V \neq \{0\}$.  Let $u\in V$.  Then, given $v\in V$, we have
+\begin{equation*}
+\Phi_{iu}(v) = \inp{v}{iu} = \overline{i}\inp{v}{u},
+\end{equation*}
+whereas
+\begin{equation*}
+i\Phi_u(v) = i\inp{v}{u}.
+\end{equation*}
+Thus $\Phi_{iu} \neq i\Phi_u$, and indeed $\Phi$ is not a linear map, since is is not homogeneous.
+\item Suppose $u, u'\in V$ are such that $\Phi_u = \Phi_{u'}$.  Then, for all $v\in V$, we have
+\begin{align*}
+&\Phi_u(v) = \Phi_{u'}(v)\\
+\implies &\inp{v}{u} = \inp{v}{u'}\\
+\implies &\inp{v}{u} - \inp{v}{u'} = 0\\
+\implies &\inp{v}{u - u'} = 0.
+\end{align*}
+In particular, choosing $v = u - u'$, the above implies $\inp{u - u'}{u - u'}=0$, which is true iff $u - u' = 0$.  Thus we conclude $u = u'$, so that $\Phi$ is indeed injective.
+\item Suppose $\F = \R$ and $\dim V = n$.  Notice that since $\Phi: V\hookrightarrow V'$, we have
+\begin{align*}
+\dim V = \dim\Null\Phi + \dim\Range\Phi = \dim\Range\Phi.
+\end{align*}
+Thus $\Phi$ is surjective as well, and we have $V \cong V'$, as was to be shown.  \qedhere
+\end{enumerate}
+\end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION C            																			           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Orthogonal Complements and Minimization Problems}
+
+% Problem 1
+\begin{problem}{1}
+Suppose $v_1,\dots, v_m \in V$.  Prove that 
+\begin{equation*}
+\{v_1, \dots, v_m\}^\perp = (\Span(v_1,\dots, v_m))^\perp.
+\end{equation*}
+\end{problem}
+\begin{proof}
+Suppose $v\in \{v_1,\dots, v_m\}^\perp$.  Then $\inp{v}{v_k}=0$ for $k=1,\dots,m$.  Let $u\in \Span(v_1,\dots, v_m)$ be arbitrary.  We want to show $\inp{v}{u} = 0$, since this implies $v \in (\Span(v_1,\dots, v_m))^\perp$ and hence $\{v_1, \dots, v_m\}^\perp \subseteq (\Span(v_1,\dots, v_m))^\perp$.  To see this, notice 
+\begin{align*}
+\inp{v}{u} &= \inp{v}{\alpha_1v_1 + \dots + \alpha_m v_m}\\
+&= \alpha_1\inp{v}{v_1} + \dots + \alpha_m\inp{v}{v_m}\\
+&= 0,
+\end{align*}
+as desired.  Next suppose $v'\in (\Span(v_1,\dots, v_m))^\perp$.  Since $v_1,\dots,v_m$ are all clearly elements of $\Span(v_1,\dots, v_m)$, clearly $v'\in \{v_1, \dots, v_m\}^\perp$, and thus $(\Span(v_1,\dots, v_m))^\perp \subseteq \{v_1, \dots, v_m\}^\perp$.  Therefore we conclude $\{v_1, \dots, v_m\}^\perp = (\Span(v_1,\dots, v_m))^\perp$.
+\end{proof}
+
+% Problem 3
+\begin{problem}{3}
+Suppose $U$ is a subspace of $V$ with basis $u_1,\dots, u_m$ and
+\begin{equation*}
+u_1, \dots, u_m, w_1, \dots, w_n 
+\end{equation*}
+is a basis of $V$.  Prove that if the Gram-Schmidt Procedure is applied to the basis of $V$ above, producing a list $e_1,\dots, e_m, f_1,\dots, f_n$, then $e_1,\dots, e_m$ is an orthonormal basis of $U$ and $f_1,\dots, f_n$ is an orthonormal basis of $U^\perp$.
+\end{problem}
+\begin{proof}
+By 6.31, $\Span(u_1,\dots, u_m) = \Span(e_1,\dots, e_m)$.  Since $e_1,\dots, e_m$ is an orthonormal list by construction (and linearly independent by 6.26), $e_1,\dots, e_m$ is indeed an orthonormal basis of $U$.  Next, since each of $f_i$ is orthogonal to each $e_j$, so too is each $f_i$ orthogonal to any element of $U$.  Thus $f_k\in U^\perp$ for $k=1,\dots,n$.  Now, since $\dim U^\perp = \dim V - \dim U = n$ by 6.50, we conclude $f_1,\dots, f_n$ is an orthonormal list of length $\dim U^\perp$ and hence an orthonormal basis of $U^\perp$.
+\end{proof}
+
+% Problem 5
+\begin{problem}{5}
+Suppose $V$ is finite-dimensional and $U$ is a subspace of $V$.  Show that $P_{U^\perp}= I - P_U$, where $I$ is the identity operator on $V$.
+\end{problem}
+\begin{proof}
+For $v\in V$, write $v = u + w$, where $u\in U$ and $w \in U^\perp$.  It follows
+\begin{align*}
+P_{U^\perp}(v) &= w\\
+&= (u + w) - u\\
+&= Iv - P_Uv,
+\end{align*}
+and therefore $P_{U^\perp}= I - P_U$, as desired.
+\end{proof}
+
+% Problem 7
+\begin{problem}{7}
+Suppose $V$ is finite-dimensional and $P\in\Hom(V)$ is such that $P^2 = P$ and every vector in $\Null P$ is orthogonal to every vector in $\Range P$.  Prove that there exists a subspace $U$ of $V$ such that $P = P_U$.
+\end{problem}
+\begin{proof}
+By Problem 4 of Chapter 5B, we know $V = \Null P \oplus \Range P$.  Let $v\in V$.  Then there exist $u\in \Null P$ and $w\in \Range P$ such that $v = u + w$ and hence
+\begin{align*}
+Pv &= P(u + w)\\
+&= Pu + Pw\\
+&= Pw.
+\end{align*}
+Let $U = \Range P$ and notice that $\Null P\subseteq \Null P_U = U^\perp$ by 6.55e.  Then $Pv = Pw = P_U(v)$, and so $U$ is the desired subpace.
+\end{proof}
+
+% Problem 9
+\begin{problem}{9}
+Suppose $T\in\Hom(V)$ and $U$ is a finite-dimensional subspace of $V$.  Prove that $U$ is invariant under $T$ if and only if $P_U T P_U = TP_U$.
+\end{problem}
+\begin{proof}
+$(\Leftarrow)$ Suppose $P_UTP_U = TP_U$ and let $u \in U$.  It follows
+\begin{align*}
+TP_u(u) = P_UTP_U(v)
+\end{align*}
+and thus
+\begin{align*}
+Tu = P_UTu.
+\end{align*}
+Since $\Range P_U = U$ by 6.55d, this implies $Tu \in U$.  Thus $U$ is indeed invariant under $T$.\\
+\indent $(\Rightarrow)$ Now suppose $U$ is invariant under $T$ and let $v\in V$.  Since $P_U(v) \in U$, it follows that $TP_U(v) \in U$.  And thus $P_UTP_U(v) = TP_U(v)$, as desired.
+\end{proof}
+
+% Problem 11
+\begin{problem}{11}
+In $\R^4$, let 
+\begin{align*}
+U = \Span\left((1, 1, 0, 0), (1, 1, 1, 2)\right).
+\end{align*}
+Find $u\in U$ such that $\norm{u - (1, 2, 3, 4)}$ is as small as possible.
+\end{problem} 
+\begin{proof}
+We first apply the Gram-Schmidt Procedure to $v_1 = (1, 1, 0, 0)$ and $v_2 = (1, 1, 1, 2)$.  This yields
+\begin{align*}
+e_1 &= \frac{v_1}{\norm{v_1}} \\
+&= \frac{(1, 1, 0, 0)}{\norm{(1, 1, 0, 0)}}\\
+&= \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}, 0, 0\right)
+\end{align*} 
+and
+\begin{align*}
+e_2 &= \frac{v_2 - \inp{v_2}{e_1}e_1}{\norm{v_2 - \inp{v_2}{e_1}e_1}}\\
+&= \frac{(1, 1, 1, 2) - \left\langle(1, 1, 1, 2), \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}, 0, 0\right)\right\rangle \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}, 0, 0\right)}{\norm{(1, 1, 1, 2) - \left\langle(1, 1, 1, 2), \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}, 0, 0\right)\right\rangle \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}, 0, 0\right)}}\\
+&= \frac{(1, 1, 1, 2) - \frac{2}{\sqrt{2}} \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}, 0, 0\right)}{\norm{(1, 1, 1, 2) - \frac{2}{\sqrt{2}} \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}, 0, 0\right)}}\\
+&= \frac{(0, 0, 1, 2)}{\norm{(0, 0, 1, 2)}}\\
+&= \left(0, 0, \frac{1}{\sqrt{5}}, \frac{2}{\sqrt{5}}\right).
+\end{align*}
+Now, with our orthonormal basis $e_1, e_2$, it follows by 6.55(i) and 6.56 that $\norm{u - (1, 2, 3, 4)}$ is minimized by the vector
+\begin{align*}
+u &= P_U(1, 2, 3, 4)\\
+&= \inp{(1, 2, 3, 4)}{e_1} e_1 + \inp{(1, 2, 3, 4)}{e_2}e_2\\
+&= \frac{3}{\sqrt{2}} \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}, 0, 0\right) + \frac{11}{\sqrt{2}}\left(0, 0, \frac{1}{\sqrt{5}}, \frac{2}{\sqrt{5}}\right)\\
+&= \left(\frac{3}{2}, \frac{3}{2}, 0, 0\right) +  \left(0, 0, \frac{11}{5}, \frac{22}{5}\right)\\
+&=  \left(\frac{3}{2}, \frac{3}{2}, \frac{11}{5}, \frac{22}{5}\right), 
+\end{align*}
+completing the proof.
+\end{proof}
+
+% Problem 13
+\begin{problem}{13}
+Find $p\in\poly_5(\R)$ that makes
+\begin{align*}
+\int_{-\pi}^\pi \abs{\sin x - p(x)}^2 dx
+\end{align*}
+as small as possible.
+\end{problem}
+\begin{proof}
+Let $\mathcal{C}_\R[-\pi, \pi]$ denote the real inner product space of continuous real-valued functions on $[-\pi, \pi]$ with inner product 
+\begin{align*}
+\inp{f}{g} = \int_{-\pi}^\pi f(x)g(x)dx,
+\end{align*}
+and let $U$ denote the subspace of $\mathcal{C}_\R[-\pi, \pi]$ consisting of the polynomials with real coefficients and degree at most $5$.  In this inner product space, observe that
+\begin{align*}
+\norm{\sin x- p(x)} = \sqrt{\int_{-\pi}^\pi \left(\sin x - p(x)\right)^2 dx} = \sqrt{\int_{-\pi}^\pi \abs{\sin x - p(x)}^2 dx}.
+\end{align*}
+Notice also that $\sqrt{\int_{-\pi}^\pi \abs{\sin x - p(x)}^2 dx}$ is minimized if and only if  $\int_{-\pi}^\pi \abs{\sin x - p(x)}^2 dx$ is minimized.  Thus by 6.56, we may conclude $p(x) = P_U(\sin x)$ minimizes  $\int_{-\pi}^\pi \abs{\sin x - p(x)}^2 dx$.  To compute $P_U(\sin x)$, we first find an orthonormal basis of $\mathcal{C}_\R[-\pi, \pi]$ by applying the Gram-Schmidt Procedure to the basis $1, x, x^2, x^3, x^4, x^5$ of $U$.  A lengthy computation yields the orthonormal basis
+\begin{align*}
+e_1 &= \frac{1}{\sqrt{2\pi}} \\
+e_2 &= \sqrt{\frac{3}{2\pi^3}}x\\
+e_3 &= -\frac{\sqrt{\frac{5}{2}}\left(\pi^2 - 3x^2\right)}{2\pi^{5/2}}\\
+e_4 &= -\frac{\sqrt{\frac{7}{2}}\left(3\pi^2x - 5x^3\right)}{2\pi^{7/2}}\\ 
+e_5 &= \frac{3\left(3\pi^4-30\pi^2x^2 + 35x^4\right)}{8\sqrt{2}\pi^{9/2}}\\
+e_6 &= -\frac{\sqrt{\frac{11}{2}}\left(15\pi^4x-70\pi^2x^3+63x^5\right)}{8\pi^{11/2}}.
+\end{align*}
+Now we compute $P_U(\sin x)$ using 6.55(i), yielding
+\begin{align*}
+P_U(\sin x) &= \frac{105\left(1485 - 153\pi^2 + \pi^4\right)}{8\pi^6}x - \frac{315\left(1155 - 125\pi^2 + \pi^4\right)}{4\pi^8}x^3\\
+&~~~~ + \frac{693\left(945 - 105\pi^2 + \pi^4\right)}{8\pi^{10}}x^5,
+\end{align*}
+which is the desired polynomial.
+\end{proof}
+\end{document}

@@ -1,0 +1,791 @@
+\documentclass{extarticle}
+\sloppy
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGES            																						  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[10pt]{extsizes}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage[shortlabels]{enumitem}
+\usepackage{microtype} 
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{commath}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PROBLEM ENVIRONMENT         																			           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems, breakable, skins}
+\newtcbtheorem{prob}% environment name
+              {Problem}% Title text
+  {enhanced, % tcolorbox styles
+  attach boxed title to top left={xshift = 4mm, yshift=-2mm},
+  colback=blue!5, colframe=black, colbacktitle=blue!3, coltitle=black,
+  boxed title style={size=small,colframe=gray},
+  fonttitle=\bfseries,
+  separator sign none
+  }%
+  {} 
+\newenvironment{problem}[1]{\begin{prob*}{#1}{}}{\end{prob*}} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS/LEMMAS/ETC.         																			  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{thm}{Theorem}
+\newtheorem*{thm-non}{Theorem}
+\newtheorem{lemma}[thm]{Lemma}
+\newtheorem{corollary}[thm]{Corollary}
+\newtheorem*{definition}{Definition}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MY COMMANDS   																						  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\Real}{\mathcal{Re}}
+\newcommand{\poly}{\mathcal{P}}
+\newcommand{\mat}{\mathcal{M}}
+\DeclareMathOperator{\Span}{span}
+\newcommand{\Hom}{\mathcal{L}}
+\DeclareMathOperator{\Null}{null}
+\DeclareMathOperator{\Range}{range}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand\widebar[1]{\mathop{\overline{#1}}}
+\newcommand{\restr}[1]{|_{#1}}
+\DeclarePairedDelimiterX{\inp}[2]{\langle}{\rangle}{#1, #2}
+\DeclarePairedDelimiter\Mod{\lvert}{\rvert}
+\DeclarePairedDelimiter\Norm{\lVert}{\rVert}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION NUMBERING																				           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand\thesection{\Alph{section}:}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT START              																			           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{\vspace{-2em}Chapter 7: Operators on Inner Product Spaces}
+\author{\emph{Linear Algebra Done Right}, by Sheldon Axler}
+\date{}
+
+\begin{document}
+\maketitle
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION A            																			           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Self-Adjoint and Normal Operators}
+
+% Problem 1
+\begin{problem}{1}
+Suppose $n$ is a positive integer.  Define $T\in\Hom(\F^n)$ by
+\begin{align*}
+T(z_1, \dots, z_n) = (0, z_1, \dots, z_{n-1}).
+\end{align*}
+Find a formula for $T^\ast(z_1,\dots, z_n)$.
+\end{problem}
+\begin{proof}
+Fix $(y_1,\dots, y_n)\in\F^n$.  Then for all $(z_1,\dots, z_n)\in \F^n$, we have
+\begin{align*}
+\inp{(z_1,\dots, z_n)}{T^\ast(y_1,\dots, y_n)} &= \inp{T(z_1,\dots, z_n)}{(y_1,\dots, y_n)}\\
+&= \inp{(0, z_1,\dots, z_{n-1})}{(y_1,\dots, y_n)}\\
+&= z_1y_2 + z_2y_3 + \dots + z_{n-1}y_n\\
+&=\inp{(z_1,\dots, z_{n-1}, z_n)}{(y_2, \dots, y_n, 0)}.
+\end{align*}
+Thus $T^*$ is the left-shift operator.  That is, for all $(z_1,\dots, z_n)\in \F^n$, we have
+\begin{align*}
+T^\ast(z_1,\dots, z_n) = (z_2, \dots, z_n, 0),
+\end{align*}
+as desired.
+\end{proof}
+
+% Problem 2
+\begin{problem}{2}
+Suppose $T\in\Hom(V)$ and $\lambda\in\F$.  Prove that $\lambda$ is an eigenvalue of $T$ if and only if $\bar{\lambda}$ is an eigenvalue of $T^\ast$.
+\end{problem}
+\begin{proof}
+Suppose $\lambda$ is an eigenvalue of $T$.  Then there exists $v\in V$ such that $Tv = \lambda v$.  It follows
+\begin{align*}
+\lambda \text{ is not an eigenvalue of }T &\iff T - \lambda I\text{ is invertible}\\
+&\iff S(T - \lambda I) = (T- \lambda I)S = I \\
+&~~~~~~~~~~\text{ for some }S\in\Hom(V)\\
+&\iff S^\ast(T^\ast - \lambda I)^\ast = (T- \lambda I)^\ast S^\ast = I^\ast\\
+&~~~~~~~~~~\text{ for some }S^\ast\in\Hom(V)\\
+&\iff (T - \lambda I)^\ast\text{ is invertible}\\
+&\iff T^\ast - \bar{\lambda}I \text{ is invertible}\\
+&\iff \bar{\lambda} \text{ is not an eigenvalue of }T^\ast.
+\end{align*}
+Since the first statement and the last statement are equivalent, so too are their contrapositives.  Hence $\lambda$ is an eigenvalue of $T$ if and only if $\bar{\lambda}$ is an eigenvalue of $T^\ast$, as was to be shown.
+\end{proof}
+
+% Problem 3
+\begin{problem}{3}
+Suppose $T\in\Hom(V)$ and $U$ is a subspace of $V$.  Prove that $U$ is invariant under $T$ if and only if $U^\perp$ is invariant under $T^\ast$.
+\end{problem}
+\begin{proof}
+$(\Rightarrow)$ First suppose $U$ is invariant under $T$, and let $x\in U^\perp$.  For any $u\in U$, it follows
+\begin{align*}
+\inp{T^\ast x}{u} &= \inp{x}{Tu}\\
+&= 0,
+\end{align*}
+where the second equality follows since $Tu\in U$ (by hypothesis).  Thus $T^\ast x\in U^\perp$ for all $x\in U^\perp$.  That is, $U^\perp$ is invariant under $T^\ast$.\\
+\indent $(\Leftarrow)$ Now suppose $U^\perp$ is invariant under $T^\ast$, and let $y\in U$.  For any $u'\in U^\perp$, it follows
+\begin{align*}
+\inp{T y}{u'} &= \inp{y}{T^\ast u'}\\
+&= 0,
+\end{align*}
+where the second equality follows since $T^\ast u'\in U^\perp$ (by hypothesis).  Thus $T y\in U$ for all $y\in U$.  That is, $U$ is invariant under $T$, completing the proof.
+\end{proof}
+
+% Problem 5
+\begin{problem}{5}
+Prove that 
+\begin{align*}
+\dim\Null T^\ast = \dim\Null T + \dim W - \dim V
+\end{align*}
+and
+\begin{align*}
+\dim\Range T^* = \dim\Range T
+\end{align*}
+for every $T\in\Hom(V, W)$.
+\end{problem}
+\begin{proof}
+Let $T\in\Hom(V, W)$.  Notice
+\begin{align*}
+\dim\Null T^\ast &= \dim\left(\Range T\right)^\perp\\
+&=\dim W - \dim\Range T\\
+&=\dim W + \dim\Null T - \dim V,
+\end{align*}
+where the first equality follows by 7.7(a), the second equality follows by 6.50, and the third equality follows by the Fundamental Theorem of Linear Maps.  Next notice
+\begin{align*}
+\dim\Range T^\ast &= \dim\left(\Null T\right)^\perp\\
+&= \dim V - \dim\Null T\\
+&= \dim \Range T,
+\end{align*}
+where the first equality follows by 7.7(b), and the second and third equalities follow again by the same theorems above.
+\end{proof}
+
+% Problem 7
+\begin{problem}{7}
+Suppose $S,T\in\Hom(V)$ are self-adjoint.  Prove that $ST$ is self-adjoint if and only if $ST=TS$.
+\end{problem}
+\begin{proof}
+$(\Rightarrow)$ Suppose $ST$ is self-adjoint.  We have
+\begin{align*}
+ST &= (ST)^\ast\\
+&= T^\ast S^\ast\\
+&=TS,
+\end{align*}
+where the second equality follows by 7.6(e).\\
+\indent $(\Leftarrow)$ Conversely, suppose $ST = TS$.  It follows
+\begin{align*}
+(ST)^\ast &= (TS)^\ast\\
+&= S^\ast T^\ast,
+\end{align*}
+where the second equality again follows by 7.6(e), completing the proof.
+\end{proof}
+
+% Problem 9
+\begin{problem}{9}
+Suppose $V$ is a complex inner product space with $V\neq\{0\}$.  Show that the set of self-adjoint operators on $V$ is not a subspace of $\Hom(V)$.
+\end{problem}
+\begin{proof}
+Let $\mathcal{A}$ denote the set of self-adjoint operators on $V$, and suppose $T\in\mathcal{A}$.  By 7.6(b), notice $(iT)^\ast = -iT^\ast$, so that $\mathcal{A}$ is not closed under scalar multiplication.  Thus $\mathcal{A}$ is not a subspace of $\Hom(V)$.
+\end{proof}
+
+% Problem 11
+\begin{problem}{11}
+Suppose $P\in\Hom(V)$ is such that $P^2 = P$.  Prove that there is a subspace $U$ of $V$ such that $P = P_U$ if and only if $P$ is self-adjoint.
+\end{problem}
+\begin{proof}
+$(\Rightarrow)$ First suppose there is a subspace $U\subseteq V$ such that $P = P_U$, and let $v_1,v_2\in V$.  It follows
+\begin{align*}
+\inp{Pv_1}{v_2} &= \inp{u_1}{u_2 + w_2}\\
+&= \inp{u_1}{u_2} + \inp{u_1}{w_2}\\
+&= \inp{u_1}{u_2}\\
+&= \inp{u_1}{u_2} + \inp{w_1}{u_2}\\
+&= \inp{u_1 + w_1}{u_2}\\
+&= \inp{v_1}{Pv_2},
+\end{align*}
+and thus $P = P^\ast$.\\
+\indent $(\Leftarrow)$ Conversely, suppose $P = P^\ast$.  Let $v\in V$.  Notice $P(v - Pv)= Pv - P^2v = 0$, and hence $v - Pv\in\Null P$.  By 7.7(c), we know $\Null P = \left(\Range P^\ast\right)^\perp$.  By hypothesis, $P$ is self-adjoint, and hence we have $v-Pv \in \left(\Range P\right)^\perp$.  Notice we may write
+\begin{align*}
+v = Pv + (v - Pv),
+\end{align*}
+where $Pv \in \Range P$ and $v-Pv \in \left(\Range P\right)^\perp$.  Let $U = \Range P$.  Since the above holds for all $v\in V$, we conclude $P = P_U$, and the proof is complete.
+\end{proof}
+
+% Problem 13
+\begin{problem}{13}
+Give an example of an operator $T\in\Hom(\C^4)$ such that $T$ is normal but not self-adjoint.
+\end{problem}
+\begin{proof}
+Let $T$ be the operator on $\C^4$ whose matrix with respect to the standard basis is
+\begin{align*}
+\begin{bmatrix}
+2 & -3 & 0 & 0\\
+3 &  2 & 0 & 0\\
+0 &  0 & 0 & 0\\
+0 &  0 & 0 & 0
+\end{bmatrix}.
+\end{align*} 
+We claim $T$ is normal and not self-adjoint.  To see that $T$ is not self-adjoint, notice that the entry in row $2$, column $1$ does not equal the complex conjugate of the entry in row $1$ column $2$.\\
+\indent Next, notice
+\begin{align*}
+\mat(TT^\ast) &= 
+\begin{bmatrix}
+2 & -3 & 0 & 0\\
+3 &  2 & 0 & 0\\
+0 &  0 & 0 & 0\\
+0 &  0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+2  & 3 & 0 & 0\\
+-3 & 2 & 0 & 0\\
+0  & 0 & 0 & 0\\
+0  & 0 & 0 & 0
+\end{bmatrix}
+= 
+\begin{bmatrix}
+13  & 0 & 0 & 0\\
+0 & 13 & 0 & 0\\
+0  & 0 & 0 & 0\\
+0  & 0 & 0 & 0
+\end{bmatrix}
+\end{align*}
+and 
+\begin{align*}
+\mat(T^\ast T) &= 
+\begin{bmatrix}
+2 & 3 & 0 & 0\\
+-3 &  2 & 0 & 0\\
+0 &  0 & 0 & 0\\
+0 &  0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+2  & -3 & 0 & 0\\
+3 & 2 & 0 & 0\\
+0  & 0 & 0 & 0\\
+0  & 0 & 0 & 0
+\end{bmatrix}
+= 
+\begin{bmatrix}
+13  & 0 & 0 & 0\\
+0 & 13 & 0 & 0\\
+0  & 0 & 0 & 0\\
+0  & 0 & 0 & 0
+\end{bmatrix},
+\end{align*}
+and hence $TT^\ast$ and $T^\ast T$ have the same matrix.  Thus $TT^\ast = T^\ast T$, and $T$ is normal.   
+\end{proof}
+
+% Problem 15
+\begin{problem}{15}
+Fix $u,x\in V$.  Define $T\in\Hom(V)$ by
+\begin{align*}
+Tv = \inp{v}{u}x
+\end{align*}
+for every $v\in V$.
+\begin{itemize}[(a)]
+\item Suppose $\F = \R$.  Prove that $T$ is self-adjoint if and only if $u,x$ is linearly dependent.
+\item Prove that $T$ is normal if and only if $u,x$ is linearly dependent.
+\end{itemize}
+\end{problem}
+\begin{proof}
+We first derive a useful formula for $T^\ast$ which we'll use in both (a) and (b).  Let $w_1,w_2\in V$ and notice
+\begin{align*}
+\inp{w_1}{T^\ast w_2} &= \inp{Tw_1}{w_2}\\
+&= \inp{\inp{w_1}{u}x}{w_2}\\
+&= \inp{w_1}{u}\inp{x}{w_2}\\
+&= \inp{w_1}{\widebar{\inp{x}{w_2}}u}\\
+&= \inp{w_1}{\inp{w_2}{x}u},
+\end{align*}
+and thus $T^\ast w_2 = \inp{w_2}{x}u$.  Since $w_2$ was arbitrary, we may rewrite this as $T^\ast v = \inp{v}{x}u$ for all $v\in V$.
+\begin{enumerate}[(a), listparindent=1.5em]
+\item $(\Rightarrow)$ Suppose $T$ is self-adjoint.  Then we have
+\begin{align*}
+\inp{v}{u}x - \inp{v}{x}u = Tv - T^\ast v = 0
+\end{align*}
+for all $v\in V$.  In particular, we have
+\begin{align*}
+\inp{u}{u}x - \inp{u}{x}u = 0.
+\end{align*}
+We may assume both $u$ and $x$ are nonzero, for otherwise there is nothing to prove.  Hence $\inp{u}{u}\neq 0$, which forces $\inp{u}{x}$ to be nonzero as well, and thus the equation above shows $u,x$ is linearly dependent.\\
+\indent $(\Leftarrow)$ Conversely, suppose $u,x$ is linearly dependent.  We may again assume both $u$ and $x$ are nonzero, for otherwise $T=0$, which is self-adjoint.  Thus there exists a nonzero $\alpha\in\R$ such that $u = \alpha x$.  It follows
+\begin{align*}
+Tv &= \inp{v}{u}x\\
+&= \inp{v}{\alpha x}\frac{1}{\alpha} u\\
+&= \inp{v}{x}u\\
+&= T^\ast,
+\end{align*}
+and thus $T$ is self-adjoint, completing the proof.
+\item $(\Rightarrow)$ Suppose $T$ is normal and let $v\in V$.  It follows
+\begin{align*}
+\inp{\inp{v}{u}x}{x}u &= T^\ast(\inp{v}{u}x)\\
+&= T^\ast Tv\\
+&= TT^\ast v\\
+&= T(\inp{v}{x}u)\\
+&= \inp{\inp{v}{x}u}{u}x.
+\end{align*}
+We may assume both $u$ and $x$ are nonzero, for otherwise there is nothing to prove.  Since the above holds for $v = u$, we may conclude $\inp{\inp{v}{u}x}{x} \neq 0$, which also forces $\inp{\inp{v}{x}u}{u} \neq 0$.  Thus $u, x$ is linearly dependent.\\
+\indent $(\Leftarrow)$ Conversely, suppose $u,x$ is linearly dependent.  We may again assume both $u$ and $x$ are nonzero, for otherwise $T = 0$, which is normal.  Thus there exists a nonzero $\alpha\in\R$ such that $u = \alpha x$.  It follows
+\begin{align*}
+T^\ast Tv &= T^\ast(\inp{v}{u}x)\\
+&= \inp{\inp{v}{u}x}{x}u\\
+&= \left\langle\inp{v}{\alpha x}\frac{1}{\alpha} u, \frac{1}{\alpha}u\right\rangle \alpha x\\
+&= \inp{\inp{v}{x}u}{u}x\\
+&= T(\inp{v}{x}u)\\
+&= TT^\ast v,
+\end{align*}
+and thus $T$ is normal, completing the proof. \qedhere
+\end{enumerate}
+\end{proof}
+
+% Problem 16
+\begin{problem}{16}
+Suppose $T\in\Hom(V)$ is normal.  Prove that
+\begin{align*}
+\Range T = \Range T^\ast.
+\end{align*}
+\end{problem}
+\begin{proof}
+Suppose $T\in\Hom(V)$ is normal.  We first prove $\Null T = \Null T^\ast$.  It follows
+\begin{align*}
+v\in\Null T &\iff Tv = 0\\
+&\iff \norm{Tv} = 0\\
+&\iff \norm{T^\ast v} = 0\\
+&\iff T^\ast v = 0\\
+&\iff v\in\Null T^\ast,
+\end{align*}
+where the third equivalence follows by 7.20, and indeed we have $\Null T = \Null T^\ast$.  This implies $(\Null T)^\perp = (\Null T^\ast)^\perp$,
+and by 7.7(b) and 7.7(c), this is equivalent to $\Range T^\ast = \Range T$, as desired.
+\end{proof}
+
+% Problem 17
+\begin{problem}{17}
+Suppose $T\in\Hom(V)$ is normal.  Prove that
+\begin{align*}
+\Null T^k = \Null T \quad \text{and} \quad \Range T^k = \Range T
+\end{align*}
+for every positive integer $k$.
+\end{problem}
+\begin{proof}
+To show $\Null T^k = \Null T$, we first prove $\Null T^k = \Null T^{k + 1}$ for all $k\in\Z^+$.  Let $m\in\Z^+$.  If $m = 1$, there's nothing to prove, so we may assume $m > 1$.  Clearly, if $v\in\Null T^m$, then $v\in\Null T^{m+1}$, and hence $\Null T^m \subseteq\Null T^{m+1}$.  Next, suppose $v\in\Null T^{m + 1}$.  Then $T(T^m v)=0$, and hence $T^mv\in\Null T$.  By Problem 16, this implies $T^mv\in\Null T^\ast$, and by 7.7(a) we have $T^m\in(\Range T)^\perp$.  Since of course $T^mv\in\Range T$ as well, we must have $T^mv = 0$.  Thus $v \in \Null T^m$, and therefore $\Null T^{m+1} \subseteq \Null T^m$.  Thus $\Null T^m = \Null T^{m + 1}$.  Since $m$ was arbitrary, this implies $\Null T^k = \Null T$ for all $k\in\Z^+$, as desired.\\
+\indent Now we will show $\Range T^k = \Range T$ for all $k\in\Z^+$.  Let $n\in\Z^+$.  If $n=1$, there's nothing to prove, so we may assume $n>1$.  Suppose $w\in \Range T^{n}$.  Then there exists $v\in V$ such that $T^nv = w$, and hence $T(T^{n-1}v) = w$, so that $w\in\Range T$ as well and we have $\Range T^n\subseteq \Range T$.  Next, notice 
+\begin{align*}
+\dim \Range T^n &= \dim V - \dim \Null T^n\\
+&= \dim V - \dim\Null T\\
+&= \dim \Range T,
+\end{align*}
+where the second equality follows from the previous paragraph.  Since $\Range T^n$ is a subspace of $\Range T$ of the same dimension, it must equal $\Range T$.  And since $n$ was arbitrary, we conclude $\Range T^k = \Range T$ for all $k\in\Z^+$, completing the proof.
+\end{proof}
+
+% Problem 19
+\begin{problem}{19}
+Suppose $T\in\Hom(\C^3)$ is normal and $T(1, 1, 1) = (2, 2, 2)$.  Suppose $(z_1,z_2,z_3)\in\Null T$.  Prove that $z_1 + z_2 + z_3 = 0$.
+\end{problem}
+\begin{proof}
+By Problem 16, $\Null T = \Null T^\ast$, hence $T^\ast(z_1, z_2, z_3) = 0$.  Therefore, we have
+\begin{align*}
+2(z_1 + z_2 + z_3) &= \inp{(2, 2, 2)}{(z_1, z_2, z_3)}\\
+&= \inp{T(1, 1, 1)}{(z_1, z_2, z_3)} \\
+&= \inp{(1, 1, 1)}{T^\ast(z_1, z_2, z_3)}\\
+&= \inp{(1, 1, 1)}{(0, 0, 0)}\\
+&= 0,
+\end{align*}
+and so $z_1 + z_2 + z_3 = 0$, as was to be shown. 
+\end{proof}
+
+% Problem 21
+\begin{problem}{21}
+Fix a positive integer $n$.  In the inner product space of continuous real-valued functions on $[-\pi, \pi]$ with inner product
+\begin{align*}
+\inp{f}{g} = \int_{-\pi}^\pi f(x)g(x)dx,
+\end{align*}
+let 
+\begin{align*}
+V = \Span(1, \cos x, \cos 2x, \dots, \cos nx, \sin x, \sin 2x, \dots, \sin nx).
+\end{align*}
+\begin{enumerate}[(a)]
+\item Define $D\in\Hom(V)$ by $Df = f'$.  Show that $D^\ast = -D$.  Conclude that $D$ is normal but not self-adjoint.
+\item Define $T\in\Hom(V)$ by $Tf = f''$.  Show that $T$ is self-adjoint.
+\end{enumerate}
+\end{problem}
+\begin{proof}
+From Problem 4 of 6B, recall that
+\begin{align*}
+\frac{1}{\sqrt{2\pi}}, \frac{\cos x}{\sqrt{\pi}}, \frac{\cos 2x}{\sqrt{\pi}}, \dots, \frac{\cos nx}{\sqrt{\pi}}, \frac{\sin x}{\sqrt{\pi}}, \frac{\sin 2x}{\sqrt{\pi}}, \dots, \frac{\sin nx}{\sqrt{\pi}}
+\end{align*}
+is an orthonormal list, and hence it is an orthonormal basis of $V$.  
+\begin{enumerate}[(a)]
+\item For $k = 1,\dots, n$, define
+\begin{align*}
+e_k = \frac{\cos(kx)}{\sqrt{\pi}}\quad\text{and}\quad f_k= \frac{\sin(kx)}{\sqrt{\pi}}.
+\end{align*}
+Notice
+\begin{align*}
+De_k = -\frac{k\sin(kx)}{\sqrt{\pi}} = -kf_k\quad\text{and}\quad Df_k = \frac{k\cos(kx)}{\sqrt{\pi}} = ke_k,
+\end{align*}
+and thus, for any $v,w\in V$, it follows
+\begin{align*}
+\inp{v}{D^\ast w} &= \inp{Dv}{w}\\
+&= \left\langle D\left(\left\langle v, \frac{1}{\sqrt{2\pi}}\right\rangle \frac{1}{\sqrt{2\pi}}+\sum_{k=1}^n\left(\inp{v}{e_k}e_k + \inp{v}{f_k}f_k\right)\right), w\right\rangle\\
+&= \left\langle \sum_{k=1}^n\left(-k\inp{v}{e_k}f_k + k\inp{v}{f_k}e_k\right), w\right\rangle\\
+&= -\sum_{k = 1}^nk\inp{v}{e_k}\inp{f_k}{w} + \sum_{k = 1}^nk\inp{v}{f_k}\inp{e_k}{w}\\
+&= -\sum_{k= 1}^nk\inp{w}{f_k}\inp{v}{e_k} +  \sum_{k = 1}^nk\inp{w}{e_k}\inp{v}{f_k}\\
+&= \sum_{k = 1}^nk\inp{w}{e_k}\inp{v}{f_k} - \sum_{k= 1}^nk\inp{w}{f_k}\inp{v}{e_k}\\
+&= \left\langle v, \sum_{k=1}^nk\inp{w}{e_k}f_k \right\rangle - \left\langle v, \sum_{k=1}^nk\inp{w}{f_k}e_k \right\rangle\\
+&= \left\langle v, \sum_{k=1}^n\left(k\inp{w}{e_k}f_k - k\inp{w}{f_k}e_k \right)\right\rangle\\
+&= \left\langle v,  -D\left(\left\langle w, \frac{1}{\sqrt{2\pi}}\right\rangle \frac{1}{\sqrt{2\pi}}+\sum_{k=1}^n\left(\inp{w}{e_k}e_k + \inp{w}{f_k}f_k\right)\right)\right\rangle\\
+&= \inp{v}{-Dw},
+\end{align*}
+and thus $D^\ast = -D$, showing that $D$ is not self-adjoint.  Moreover, notice that this implies
+\begin{align*}
+DD^\ast = D(-D) = -DD = (D^\ast)D = D^\ast D,
+\end{align*}
+so that $D$ is normal, completing the proof.
+
+\item Notice $T = D^2$, and hence
+\begin{align*} 
+T^\ast = (DD)^\ast = D^\ast D^\ast = (-D)(-D) = D^2  = T.
+\end{align*}
+Thus $T$ is self-adjoint. \qedhere
+\end{enumerate}
+\end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION B           																			           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Spectral Theorem}
+
+% Problem 1
+\begin{problem}{1}
+True or false (and give a proof of your answer): There exists $T\in\Hom(\R^3)$ such that $T$ is not self-adjoint (with respect to the usual inner product) and such that there is a basis of $\R^3$ consisting of eigenvectors of $T$.
+\end{problem}
+\begin{proof}
+The statement is true.  To see this, consider the linear operator $T$ defined by its action on the basis $(1, 0, 0), (0, 1, 0), (0, 1, 1)$:
+\begin{align*}
+T(1, 0, 0) &= (0, 0, 0)\\
+T(0, 1, 0) &= (0, 0, 0)\\
+T(0, 1, 1) &= (0, 1, 1).
+\end{align*}
+Notice $T(1, 0, 0) = 0\cdot (1, 0, 0)$ and $T(0, 1, 0) = 0\cdot (0, 1, 0)$, so that $(1, 0, 0)$ and $(0, 1, 0)$ are eigenvectors with eigenvalue $0$.  Also, $(0, 1, 1)$ is an eigenvector with eigenvalue $1$.  Thus $(1, 0, 0), (0, 1, 0), (0, 1, 1)$ is a basis of $\R^3$ consisting of eigenvectors of $T$.  That $T$ is not self-adjoint follows from the contrapositive of 7.22, since $(0, 1, 0)$ and $(0, 1, 1)$ correspond to distinct eigenvalues yet they are not orthogonal.
+\end{proof}
+
+% Problem 3
+\begin{problem}{3}
+Give an example of an operator $T\in\Hom(\C^3)$ such that $2$ and $3$ are the only eigenvalues of $T$ and $T^2 - 5T + 6I \neq 0$.
+\end{problem}
+\begin{proof}
+Define $T\in\Hom(\C^3)$ by its action on the standard basis:
+\begin{align*}
+Te_1 &= 2e_2\\
+Te_2 &= e_1 + 2e_2\\
+Te_3 &= 3e_3.
+\end{align*}
+Then 
+\begin{align*}
+\mat(T) = \begin{bmatrix}2 & 1 & 0\\ 0 & 2 & 0\\ 0 & 0 & 3\end{bmatrix}.
+\end{align*}
+By 5.32, the only eigenvalues of $T$ are the entries on the diagonal: $2$ and $3$.  Now notice
+\begin{align*}
+(T^2 - 5T + 6I)e_2 &= (T - 3I)(T - 2I)e_2\\
+&= (T - 3I)(Te_2 - 2e_2)\\
+&= (T - 3I)(e_1 + 2e_2 - 2e_2)\\
+&= (T - 3I)e_1\\
+&= Te_1 - 3e_1\\
+&= -e_1,
+\end{align*}
+so that $T^2 - 5T + 6I\neq 0$.  Thus $T$ is an operator of the desired form.
+\end{proof}
+
+% Problem 5
+\begin{problem}{5}
+Suppose $\F=\R$ and $T\in\Hom(V)$.  Prove that $T$ is self-adjoint if and only if all pairs of eigenvectors corresponding to distinct eigenvalues of $T$ are orthogonal and 
+\begin{align*}
+V = E(\lambda_1, T)\oplus \dots \oplus E(\lambda_m, T),
+\end{align*}
+where $\lambda_1,\dots,\lambda_m$ denote the distinct eigenvalues of $T$.
+\end{problem}
+\begin{proof}
+$(\Leftarrow)$ Suppose all pairs of eigenvectors corresponding to distinct eigenvalues of $T$ are orthogonal and 
+\begin{align*}
+V = E(\lambda_1, T)\oplus \dots \oplus E(\lambda_m, T),
+\end{align*}
+where $\lambda_1,\dots,\lambda_m$ denote the distinct eigenvalues of $T$.  By 5.41, $V$ has a basis consisting of eigenvectors of $T$.  Dividing each element of the basis by its norm produces an orthonormal basis consisting of eigenvectors of $T$.  By the Real Spectral Theorem, $T$ is self-adjoint, as desired.\\
+\indent $(\Rightarrow)$ Conversely, suppose $T$ is self-adjoint as suppose $v_1,v_2\in V$ are eigenvectors of $T$ corresponding to eigenvalues $\lambda_1,\lambda_2\in\R$ such that $\lambda_1\neq\lambda_2$.  It follows
+\begin{align*}
+0 &= \inp{Tv_1}{v_2} - \inp{v_1}{Tv_2}\\
+&= \inp{\lambda_1 v_1}{v_2} - \inp{v_1}{\lambda_2 v_2}\\
+&= \lambda_1\inp{v_1}{v_2} - \widebar{\lambda_2}\inp{v_1}{v_2}\\
+&= \lambda_1\inp{v_1}{v_2} - \lambda_2\inp{v_1}{v_2}\\
+&= (\lambda_1 - \lambda_2)\inp{v_1}{v_2}.
+\end{align*}
+Since $\lambda_1\neq \lambda_2$, it must be that $\inp{v_1}{v_2}=0$.  Thus all pairs of eigenvectors corresponding to distinct eigenvalues of $T$ are orthogonal.  By the Real Spectral Theorem, since $T$ is self-adjoint, $T$ is diagonalizable.  And by 5.34, this implies
+\begin{align*}
+V = E(\lambda_1, T)\oplus \dots \oplus E(\lambda_m, T),
+\end{align*}
+where $\lambda_1,\dots,\lambda_m$ denote the distinct eigenvalues of $T$, completing the proof.
+\end{proof}
+
+% Problem 6
+\begin{problem}{6}
+Prove that a normal operator on a complex vector space is self-adjoint if and only if all its eigenvalues are real.
+\end{problem}
+\begin{proof}
+Let $T$ be a normal operator on a complex vector space, $V$.\\
+\indent $(\Rightarrow)$ Suppose $T$ is self-adjoint.  Then by 7.13, all eigenvalues of $T$ are real.\\
+\indent $(\Leftarrow)$ Conversely, suppose all eigenvalues of $T$ are real.  By the Complex Spectral Theorem, there exists an orthonormal basis $v_1,\dots, v_n$ of $V$ consisting of eigenvectors of $T$.  Thus there exist $\lambda_1,\dots, \lambda_n\in\R$ such that $Tv_k = \lambda_k v_k$ for $k = 1,\dots, n$.  Thus $\mat(T)$ is diagonal, and all entries along the diagonal are real.  Therefore $\mat(T)$ equals the conjugate transpose of $\mat(T)$.  By 7.10, this implies $\mat(T) = \mat(T^\ast)$, and we conclude $T = T^\ast$, so that $T$ is indeed self-adjoint.
+\end{proof}
+
+% Problem 7
+\begin{problem}{7}
+Suppose $V$ is a complex inner product space and $T\in\Hom(V)$ is a normal operator such that $T^9 = T^8$.  Prove that $T$ is self-adjoint and $T^2 = T$.   
+\end{problem}
+\begin{proof}
+By the Complex Spectral Theorem, since $T$ is normal, $V$ has an orthonormal basis $v_1,\dots, v_n$ consisting of eigenvectors of $T$.  Let $\lambda_1,\dots, \lambda_n\in\C$ be the corresponding eigenvalues, so that
+\begin{align*}
+Tv_k = \lambda_k v_k
+\end{align*}
+for $k = 1,\dots, n$.  Repeatedly applying $T$ to both sides of the equation above $8$ times yields
+\begin{align*}
+T^9v_k = (\lambda_k)^9 v_k\quad\text{and}\quad T^8v_k = (\lambda_k)^8 v_k.
+\end{align*}
+Since $T^9 = T^8$, we conclude $(\lambda_k)^9 = (\lambda_k)^8$ and thus $\lambda_k\in\{0, 1\}$.  In particular, all eigenvalues of $T$ are real, hence by Problem 6 we have that $T$ is self-adjoint.\\
+\indent To see that $T^2 = T$, notice 
+\begin{align*}
+T^2v_k &= (\lambda_k)^2v_k\\
+&= \lambda_k v_k\\
+&=Tv_k,
+\end{align*}
+where the second equality follows from the fact that $\lambda_k\in\{0,1\}$, and the proof is complete.
+\end{proof}
+
+% Problem 9
+\begin{problem}{9}
+Suppose $V$ is a complex inner product space.  Prove that every normal operator on $V$ has a square root.  (An operator $S\in\Hom(V)$ is called a \textbf{\textit{square root}} of $T\in\Hom(V)$ if $S^2 = T$.)
+\end{problem}
+\begin{proof}
+Suppose $T\in\Hom(V)$ is normal.  By the Complex Spectral Theorem, $V$ has an orthonormal basis $v_1,\dots, v_n$ consisting of eigenvectors of $T$.  Let $\lambda_1,\dots, \lambda_n\in\C$ be the corresponding eigenvalues, so that
+\begin{align*}
+Tv_k = \lambda_k v_k
+\end{align*}
+for $k = 1,\dots, n$.  Define $S\in\Hom(V)$ by its action on this basis:
+\begin{align*}
+Sv_k = \sqrt{\lambda_k}v_k,
+\end{align*}
+choosing the complex square root $\sqrt{\lambda_k}$ by some definite rule.  Let $v\in V$.  Then there exist $\alpha_1,\dots, \alpha_n\in\C$ such that $v = \alpha_1v_1 + \dots + \alpha_nv_n$.  It follows
+\begin{align*}
+S^2 v &= S^2( \alpha_1v_1 + \dots + \alpha_nv_n)\\
+&= S\left(\alpha_1\sqrt{\lambda_1}v_1 + \dots + \alpha_n\sqrt{\lambda_n}v_n\right)\\
+&= \alpha_1\lambda_1v_1 + \dots + \alpha_n\lambda_n v_n\\
+&= \alpha_1Tv_1 + \dots + \alpha_nTv_n\\
+&= T( \alpha_1v_1 + \dots + \alpha_nv_n)\\
+&= Tv.
+\end{align*}
+Thus $S^2 = T$, and indeed $T$ has a square root, as was to be shown.
+\end{proof}
+
+\begin{problem}{11}
+Prove or give a counterexample: every self-adjoint operator on $V$ has a cube root.  (An operator $T\in\Hom(V)$ is called a \textbf{\textit{cube root}} of $T\in\Hom(V)$ if $S^3 = T$.)
+\end{problem}
+\begin{proof}
+Suppose $T\in\Hom(V)$ is self-adjoint.  Regardless of whether $\F=\R$ or $\F=\C$, both Spectral Theorems imply that $V$ has an orthonormal basis $v_1,\dots, v_n$ consisting of eigenvectors of $T$.  By 7.13, all eigenvalues of $T$ are real.  So let $\lambda_1,\dots, \lambda_n\in\R$ be the eigenvalues corresponding to $v_1,\dots, v_n$, so that
+\begin{align*}
+Tv_k = \lambda_k v_k
+\end{align*}
+for $k = 1,\dots, n$.  Define $S\in\Hom(V)$ by its action on this basis:
+\begin{align*}
+Sv_k = (\lambda_k)^\frac{1}{3}v_k,
+\end{align*}
+Let $v\in V$.  Then there exist $\alpha_1,\dots, \alpha_n\in\F$ such that $v = \alpha_1v_1 + \dots + \alpha_nv_n$.  It follows
+\begin{align*}
+S^3 v &= S^3( \alpha_1v_1 + \dots + \alpha_nv_n)\\
+&= S^2\left(\alpha_1(\lambda_1)^\frac{1}{3}v_1 + \dots + \alpha_n(\lambda_n)^\frac{1}{3}v_n\right)\\
+&= S\left(\alpha_1(\lambda_1)^\frac{2}{3}v_1 + \dots + \alpha_n(\lambda_n)^\frac{2}{3} v_n\right)\\
+&= \alpha_1\lambda_1v_1 + \dots + \alpha_n\lambda_n v_n\\
+&= \alpha_1Tv_1 + \dots + \alpha_nTv_n\\
+&= T( \alpha_1v_1 + \dots + \alpha_nv_n)\\
+&= Tv.
+\end{align*}
+Thus $S^3 = T$, and indeed $T$ has a cube root.  Thus, all self-adjoint operators on a finite-dimensional inner product space have a cube root.
+\end{proof}
+
+% Problem 13
+\begin{problem}{13}
+Give an alternative proof of the Complex Spectral Theorem that avoids Schur's Theorem and instead follows the pattern of the proof of the Real Spectral Theorem.
+\end{problem}
+\begin{proof}
+Suppose (c) holds, so that $T$ has a diagonal matrix with respect to some orthonormal basis of $V$.  The matrix of $T^\ast$ (with respect to the same basis) is obtained by taking the conjugate transpose of the matrix of $T$; hence $T^\ast$ also has a diagonal matrix.  Any two diagonal matrices commute; thus $T$ commutes with $T^\ast$, which means that $T$ is normal.  That is, (a) holds.\\
+\indent We will prove that (a) implies (b) by induction on $\dim V$.  For our base case, suppose $\dim V= 1$.  Since 5.21 guarantees the existence of an eigenvector of $T$, clearly (b) is true in this case.  Next assume that $\dim V > 1$ and that (a) implies (b) for all complex inner product spaces of smaller dimension.\\
+\indent Suppose (a) holds, so that $T$ is normal.  Let $u$ be an eigenvector of $T$ with $\norm{u} = 1$, and set $U = \Span(u)$.  Clearly $U$ is invariant under $T$.  By Problem 3 of 7A, this implies that $U^\perp$ is invariant under $T^\ast$ as well.  But of course $T^\ast$ is also normal, and since $\dim U^\perp = \dim V - 1$, our inductive hypothesis implies that there exists an orthonormal basis of $U^\perp$ consisting of eigenvectors of $T\mid_{U^\perp}$.  Adjoining $u$ to this basis gives an orthonormal basis of $V$ consisting of eigenvectors of $T$, completing the proof that (a) implies (b).\\
+\indent We have proved that (c) implies (a) and that (a) implies (b).  Clearly (b) implies (c), and the proof is complete.
+\end{proof}
+
+% Problem 15
+\begin{problem}{15}
+Find the value of $x$ such that the matrix
+\begin{align*}
+\begin{bmatrix}
+1 & 1 & 0 \\
+0 & 1 & 1 \\
+1 & 0 & x 
+\end{bmatrix}
+\end{align*}
+is normal.
+\end{problem}
+\begin{proof}
+Let $M$ be the above matrix.  We wish to find $x\in \F$ such that $MM^\ast = M^\ast M$.  Notice
+\begin{align*}
+MM^\ast &= \begin{bmatrix}
+1 & 1 & 0 \\
+0 & 1 & 1 \\
+1 & 0 & x 
+\end{bmatrix}
+\begin{bmatrix}
+1 & 0 & 1 \\
+1 & 1 & 0 \\
+0 & 1 & x 
+\end{bmatrix}\\
+&= 
+\begin{bmatrix}
+2 & 1 & 1 \\
+1 & 2 & x \\
+1 & x & 1 + x^2 
+\end{bmatrix}
+\end{align*}
+and
+\begin{align*}
+M^\ast M &= 
+\begin{bmatrix}
+1 & 0 & 1 \\
+1 & 1 & 0 \\
+0 & 1 & x 
+\end{bmatrix}
+\begin{bmatrix}
+1 & 1 & 0 \\
+0 & 1 & 1 \\
+1 & 0 & x 
+\end{bmatrix}\\
+&= 
+\begin{bmatrix}
+2 & 1 & x \\
+1 & 2 & 1 \\
+x & 1 & 1 + x^2 
+\end{bmatrix}.
+\end{align*}
+Thus it must be that $x = 1$.
+\end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION C           																			           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Positive Operators and Isometries}
+
+% Problem 1
+\begin{problem}{1}
+Prove or give a counterexample: If $T\in\Hom(V)$ is self-adjoint and there exists an orthonormal basis $e_1,\dots, e_n$ of $V$ such that $\inp{Te_j}{e_j}\geq 0 $ for each $j$, then $T$ is a positive operator.
+\end{problem}
+\begin{proof}
+The statement is false.  To see this, let $e_1, e_2\in \R^2$ be the standard basis and consider $T\in\Hom(\R^2)$ defined by
+\begin{align*}
+Te_1 &= e_1\\
+Te_2 &= -e_2.
+\end{align*}
+Then
+\begin{align*}
+\mat(T) = \begin{bmatrix}
+1 & 0\\
+0 & -1
+\end{bmatrix},
+\end{align*}
+and since $\mat(T)$ is diagonal, $T$ must be self-adjoint by the Real Spectral Theorem.  But notice that the basis 
+\begin{align*}
+v_1 &= \frac{1}{\sqrt{2}}(e_1 + e_2)\\
+v_2 &= \frac{1}{\sqrt{2}}(e_1 - e_2)
+\end{align*}
+is orthonormal and that
+\begin{align*}
+\inp{Tv_1}{v_1} = \inp{v_2}{v_1} = 0
+\end{align*}
+and
+\begin{align*}
+\inp{Tv_2}{v_2} = \inp{v_1}{v_2} = 0.
+\end{align*}
+Thus $T$ is of the desired form, but $T$ is not a positive operator, since 
+\begin{align*}
+\inp{Te_2}{e_2} = \inp{-e_2}{e_2} = -1,
+\end{align*}
+completing the proof.
+\end{proof}
+
+% Problem 3
+\begin{problem}{3}
+Suppose $T$ is a positive operator on $V$ and $U$ is a subspace of $V$ invariant under $T$.  Prove that $T\mid_{U}\in\Hom(U)$ is a positive operator on $U$.
+\end{problem}
+\begin{proof}
+That $T\mid_{U}$ is self-adjoint follows by 7.28.  Let $u\in U$.  Then, since
+\begin{align*}
+\inp{T\mid_{U}(u)}{u} &= \inp{Tu}{u} > 0,
+\end{align*}
+$T\mid_{U}$ is a positive operator on $U$, as was to be shown.
+\end{proof}
+
+% Problem 5
+\begin{problem}{5}
+Prove that the sum of two positive operators on $V$ is positive.
+\end{problem}
+\begin{proof}
+Let $S,T\in\Hom(V)$ be positive operators.  Notice
+\begin{align*}
+(S + T)^\ast = S^\ast + T^\ast = S + T,
+\end{align*}
+hence $S + T$ is self-adjoint.  Next, let $v\in V$.  It follows
+\begin{align*}
+\inp{(S + T)v}{v} &= \inp{Sv + Tv}{v}\\
+&= \inp{Sv}{v} + \inp{Tv}{v}\\
+&\geq 0,
+\end{align*}
+and thus $S + T$ is a positive operator as well. 
+\end{proof}
+
+% Problem 7
+\begin{problem}{7}
+Suppose $T$ is a positive operator on $V$.  Prove that $T$ is invertible if and only if
+\begin{align*}
+\inp{Tv}{v} > 0
+\end{align*}
+for every $v\in V$ with $v\neq 0$.
+\end{problem}
+\begin{proof}
+Let $T$ be a positive operator on $V$.\\
+\indent $(\Rightarrow)$ Suppose $T$ is invertible and let $v\in V\setminus\{0\}$.  Since $T$ is a positive operator, by 7.35(e) there exists $R\in\Hom(V)$ such that $T = R^2$.  Since $T$ is invertible, so is $R$.  In particular, $R$ is injective, and thus $Rv\neq 0$.  It follows
+\begin{align*}
+\inp{Tv}{v} &= \inp{R^2}{v}\\
+&= \inp{Rv}{R^\ast v}\\
+&= \inp{Rv}{Rv}\\
+&= \norm{Rv}^2\\
+&> 0,
+\end{align*} 
+completing the proof in one direction.\\
+\indent $(\Leftarrow)$ Now suppose $\inp{Tv}{v} > 0$ for every $v\in V\setminus\{0\}$.  Assume by way of contraction that $T$ is not invertible, so that there exists $w\in V\setminus\{0\}$ such that $Tw = 0$.  But then $\inp{Tw}{w} = \inp{0}{w} = 0$, a contradiction.  Thus $T$ must be invertible, completing the proof.
+\end{proof}
+
+% Problem 9
+\begin{problem}{9}
+Prove or disprove: the identity operator on $\F^2$ has infinitely many self-adjoint square roots.
+\end{problem}
+\end{document}

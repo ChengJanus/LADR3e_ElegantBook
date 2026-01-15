@@ -1,0 +1,72 @@
+%!TEX program = xelatex
+\documentclass[lang=en,11pt,color=blue]{elegantbook}
+
+\input{preamble_symbols}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\begin{document}
+
+% --- Professional Cover Design (0.618 Golden Ratio) ---
+\begin{titlepage}
+    \begin{tikzpicture}[remember picture, overlay]
+        % Background
+        \fill[color=structurecolor] (current page.north west) rectangle ($(current page.north east)-(0, 0.618\paperheight)$);
+        \draw[white!20, line width=1pt] ($(current page.north west)-(0, 0.618\paperheight-0.05cm)$)--($(current page.north east)-(0, 0.618\paperheight-0.05cm)$);
+        
+        % Profile Picture
+        \node[anchor=north east, xshift=-1.8cm, yshift=-1.8cm] at (current page.north east) {
+            \IfFileExists{image/avatar.jpg}{
+                \begin{tikzpicture}
+                    \begin{scope}
+                        \clip (0,0) circle (1.3cm);
+                        \node[anchor=center] at (0,0) {\includegraphics[width=2.6cm]{image/avatar.jpg}};
+                    \end{scope}
+                    \draw[white, line width=1.5pt] (0,0) circle (1.3cm);
+                \end{tikzpicture}
+            }{}
+        };
+        
+        % Main Title Area
+        \node[anchor=center, text width=19cm, align=center] at ($(current page.north)+(0, -0.309\paperheight)$) {
+            {\fontsize{45}{45}\bfseries\color{white} Solutions to}\\[0.8cm]
+            {\fontsize{35}{35}\bfseries\color{white} Linear Algebra Done Right}\\[1.2cm]
+            \tikz{\node[draw=white!60, text=white, rounded corners=2pt, inner sep=5pt, font=\Large\itshape] {Exercises from the 3rd Edition};}\\[1.5cm]
+            {\footnotesize\color{white!65} Open Source Edition | \monthyear}
+        };
+        
+        % Author Info
+        \node[anchor=center, align=center] at ($(current page.north)-(0, 0.82\paperheight)$) {
+            {\LARGE\bfseries Janus Cheng}\\[0.4cm]
+            {\large\textit{Zhengzhou, Henan, China}}\\[1.2cm]
+            {\small\color{gray!80} \faGithub\ \href{https://github.com/JanusCheng/LADR3e_ElegantBook}{\texttt{github.com/JanusCheng/LADR3e\_ElegantBook}}}
+        };
+        
+        % Footer
+        \node[anchor=south, yshift=2.5cm, text width=14cm, align=center] at (current page.south) {
+            \color{gray!60}\footnotesize
+            Released under the \textbf{CC BY-NC-SA 4.0} License. \\
+            Based on the source code by \textit{jubnoske08}.
+        };
+        
+        \node[anchor=south, yshift=2cm] at (current page.south) {
+            \color{structurecolor}\rule{12cm}{1.2pt}
+        };
+    \end{tikzpicture}
+\end{titlepage}
+
+\frontmatter
+\input{preface}
+\tableofcontents
+
+\mainmatter
+% --- Chapter Inputs ---
+\chapter{Vector Spaces} \input{chapter_1} 
+\chapter{Finite-Dimensional Vector Spaces} \input{chapter_2} 
+\chapter{Linear Maps} \input{chapter_3}
+\chapter{Polynomials} \input{chapter_4}
+\chapter{Eigenvalues, Eigenvectors, and Invariant Subspaces} \input{chapter_5}
+\chapter{Inner Product Spaces} \input{chapter_6}
+\chapter{Operators on Inner Product Spaces} \input{chapter_7}
+
+\end{document}

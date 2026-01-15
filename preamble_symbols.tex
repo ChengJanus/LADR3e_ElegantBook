@@ -1,0 +1,85 @@
+% !TEX root = LADR3e_ElegantBook.tex
+
+% --- Core Packages ---
+\let\proof\relax \let\endproof\relax
+\usepackage{amsthm, mathtools, commath, docmute}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{fontawesome5} 
+
+\sloppy 
+
+% --- PDF Metadata ---
+\AtBeginDocument{
+  \hypersetup{
+    pdftitle={Solutions to Linear Algebra Done Right},
+    pdfauthor={Janus Cheng},
+    pdfsubject={Linear Algebra, Sheldon Axler},
+    pdfkeywords={LADR, Math, Solutions, JanusCheng}
+  }
+}
+
+% --- Math Symbols & Operators ---
+\newcommand{\R}{\mathbb{R}}
+\providecommand{\C}{} \renewcommand{\C}{\mathbb{C}} 
+\newcommand{\F}{\mathbb{F}} \newcommand{\N}{\mathbb{N}} 
+\newcommand{\Z}{\mathbb{Z}} \newcommand{\Q}{\mathbb{Q}} 
+
+\DeclareMathOperator{\Span}{span} 
+\DeclareMathOperator{\Range}{range} 
+\DeclareMathOperator{\Null}{null} 
+\DeclareMathOperator{\poly}{\mathcal{P}} 
+\newcommand{\mat}{\mathcal{M}}           
+\providecommand{\Hom}{} \renewcommand{\Hom}{\mathcal{L}} 
+\newcommand{\defeq}{\vcentcolon=} 
+\newcommand{\restr}[1]{|_{#1}}
+\newcommand{\widebar}[1]{\mathop{\overline{#1}}}
+
+\let\abs\relax \let\norm\relax
+\DeclarePairedDelimiterX{\inp}[2]{\langle}{\rangle}{#1, #2}
+\DeclarePairedDelimiter\Mod{\lvert}{\rvert}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\DeclarePairedDelimiter\Norm{\lVert}{\rVert} 
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+
+% --- Section Numbering (e.g., 1A, 1B) ---
+\renewcommand{\thesection}{\thechapter\Alph{section}}
+
+% --- Custom Problem Environment ---
+\let\problem\relax
+\let\endproblem\relax
+\newenvironment{problem}[1]{%
+    \begin{tcolorbox}[
+        enhanced, breakable,
+        colback=structurecolor!5,
+        colframe=structurecolor,
+        coltitle=structurecolor,
+        fonttitle=\bfseries,
+        title={Exercise #1},
+        after title={\enskip},
+        attach title to upper,
+        sharp corners,
+        boxrule=0.5pt,
+        top=2mm, bottom=2mm
+    ]%
+    \addcontentsline{toc}{subsection}{Exercise #1}
+}{%
+    \end{tcolorbox}%
+}
+
+% --- Theorem Environments Mapping ---
+\renewcommand{\maketitle}{} 
+\newenvironment{thm}{\begin{theorem}}{\end{theorem}}
+\newenvironment{defn}{\begin{definition}}{\end{definition}}
+\newenvironment{lem}{\begin{lemma}}{\end{lemma}}
+\newenvironment{cor}{\begin{corollary}}{\end{corollary}}
+\newenvironment{prop}{\begin{proposition}}{\end{proposition}}
+\newenvironment{thm-non}{\begin{theorem*}}{\end{theorem*}}
+\renewenvironment{solution}{\begin{proof}[Solution]}{\end{proof}}
+
+\pdfstringdefDisableCommands{\def\R{R}\def\C{C}\def\F{F}\def\N{N}\def\Z{Z}\def\Q{Q}}
+
+% --- Dynamic Date Helper ---
+\newcommand{\monthyear}{%
+  \ifcase\month\or January\or February\or March\or April\or May\or June\or July\or August\or September\or October\or November\or December\fi\space \the\year
+}
